@@ -1,4 +1,4 @@
-public class Product
+public class ProductEntity
 {
     public int ProductId { get; set; }
     public required string ProductName { get; set; }
