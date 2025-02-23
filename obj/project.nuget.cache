@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "eO/i2bXS2cw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Daniel\\Documents\\GitHub\\Web_Labb2\\Web_Labb2.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Daniel\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.2\\microsoft.aspnetcore.openapi.9.0.2.nupkg.sha512",
+    "C:\\Users\\Daniel\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\Daniel\\.nuget\\packages\\scalar.aspnetcore\\2.0.18\\scalar.aspnetcore.2.0.18.nupkg.sha512"
+  ],
+  "logs": []
+}
