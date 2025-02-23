@@ -5,5 +5,5 @@ public class CustomerEntity
     public required string LastName { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
-    public AdressEntity? AddressInformation { get; set; }
+    public AddressEntity? AddressInformation { get; set; }
 }
