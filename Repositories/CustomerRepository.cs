@@ -32,6 +32,11 @@ namespace Web_Labb2.Repositories
         {
             return await _context.CustomerEntitys.FirstOrDefaultAsync(c => c.Email == email);
         }
+
+        public async Task DeleteCustomerAsync(CustomerEntity deleteCustomer)
+        {
+            _context.CustomerEntitys.Remove(deleteCustomer);
+        }
     }
 
 }

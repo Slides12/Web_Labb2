@@ -27,16 +27,32 @@ namespace Web_Labb2.Controllers
         }
 
         // GET api/<CustomerController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{email}")]
+        public async Task<ActionResult<CustomerDTO>> GetCustomerByEmail(string email)
         {
-            return "value";
+            var result = await _customerService.GetCustomerByEmail(email);
+            if (result == null)
+            {
+                return BadRequest("Customer not fouund. Did you put the correct email?");
+            }
+
+            return Ok(result);
         }
 
         // POST api/<CustomerController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult> PostCustomer([FromBody] CustomerDTO value)
         {
+            if(value != null)
+            { 
+                var result = await _customerService.AddCustomerAsync(value);
+                if(!result)
+                {
+                    return BadRequest("You need to add all information of the customer or the email is allready in use. Try again.");
+                }
+            }
+            return Created("Added to the DB",value);
+
         }
 
         // PUT api/<CustomerController>/5
@@ -46,9 +62,14 @@ namespace Web_Labb2.Controllers
         }
 
         // DELETE api/<CustomerController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{email}")]
+        public async Task<ActionResult> DeleteCustomerByEmail(string email)
         {
+            if(string.IsNullOrEmpty(email))
+            {
+                return BadRequest("You need to input a correct email.");
+            }
+            return Ok(await _customerService.DeleteCustomerByEmail(email));
         }
     }
 }
