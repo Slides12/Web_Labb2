@@ -6,4 +6,5 @@ public class CustomerEntity
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public AddressEntity? AddressInformation { get; set; }
+    public List<ProductEntity> OrderItems { get; set; } = new List<ProductEntity>();
 }

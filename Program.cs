@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Web_Labb2.Data;
+using Web_Labb2.Repositories;
+using Web_Labb2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,12 @@ var options = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
 var connectionString = options["connectionString"];
 builder.Services.AddDbContext<APIDBContext>(options =>
     options.UseSqlServer(connectionString));
+
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<CustomerService>();
+
 
 
 var app = builder.Build();
