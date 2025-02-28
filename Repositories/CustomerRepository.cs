@@ -18,14 +18,14 @@ namespace Web_Labb2.Repositories
             await _context.CustomerEntitys.AddAsync(customer);
         }
 
-        public void Update(CustomerEntity customer)
+        public void UpdateCustomer(CustomerEntity customer)
         {
             _context.CustomerEntitys.Update(customer);
         }
 
         public async Task<IEnumerable<CustomerEntity>> GetAllAsync()
         {
-            return await _context.CustomerEntitys.ToListAsync();
+            return await _context.CustomerEntitys.Include(c => c.AddressInformation).ToListAsync();
         }
 
         public async Task<CustomerEntity> GetCustomerByEmailAsync(string email)
@@ -33,7 +33,7 @@ namespace Web_Labb2.Repositories
             return await _context.CustomerEntitys.FirstOrDefaultAsync(c => c.Email == email);
         }
 
-        public async Task DeleteCustomerAsync(CustomerEntity deleteCustomer)
+        public void DeleteCustomer(CustomerEntity deleteCustomer)
         {
             _context.CustomerEntitys.Remove(deleteCustomer);
         }

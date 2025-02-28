@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Web_Labb2.Migrations
 {
     [DbContext(typeof(APIDBContext))]
-    [Migration("20250227124932_Initial")]
+    [Migration("20250228142045_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -101,8 +101,9 @@ namespace Web_Labb2.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()

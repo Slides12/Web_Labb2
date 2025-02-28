@@ -19,8 +19,10 @@ builder.Services.AddDbContext<APIDBContext>(options =>
 
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<ProductService>();
 
 
 

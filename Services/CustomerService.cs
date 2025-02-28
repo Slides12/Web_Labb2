@@ -67,7 +67,13 @@ namespace Web_Labb2.Services
                         FirstName = customer.FirstName,
                         LastName = customer.LastName,
                         Email = customer.Email,
-                        AddressInformation = new AddressEntity(),
+                        AddressInformation = new AddressEntity()
+                        {
+                            Address = customer.AddressInformation.Address,
+                            PostNumber = customer.AddressInformation.PostNumber,
+                            City = customer.AddressInformation.City,
+                            Country = customer.AddressInformation.Country,
+                        },
                         PhoneNumber = customer.PhoneNumber,
                     });
                     await _unitOfWork.SaveChangesAsync();
@@ -85,10 +91,48 @@ namespace Web_Labb2.Services
             {
                 return false;
             }
-            await _unitOfWork.Customers.DeleteCustomerAsync(customer);
+            _unitOfWork.Customers.DeleteCustomer(customer);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task<bool> UpdateCustomerByEmail(string email, CustomerDTO updatedCustomer)
+        {
+            if (string.IsNullOrEmpty(email) || updatedCustomer == null)
+            {
+                return false;
+            }
+
+            var existingCustomer = await _unitOfWork.Customers.GetCustomerByEmailAsync(email);
+
+            if (existingCustomer == null)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(updatedCustomer.FirstName))
+                existingCustomer.FirstName = updatedCustomer.FirstName;
+
+            if (!string.IsNullOrEmpty(updatedCustomer.LastName))
+                existingCustomer.LastName = updatedCustomer.LastName;
+
+            if (!string.IsNullOrEmpty(updatedCustomer.PhoneNumber))
+                existingCustomer.PhoneNumber = updatedCustomer.PhoneNumber;
+
+            if (updatedCustomer.AddressInformation != null)
+            {
+                existingCustomer.AddressInformation.Address = updatedCustomer.AddressInformation.Address;
+                existingCustomer.AddressInformation.PostNumber = updatedCustomer.AddressInformation.PostNumber;
+                existingCustomer.AddressInformation.City = updatedCustomer.AddressInformation.City;
+                existingCustomer.AddressInformation.Country = updatedCustomer.AddressInformation.Country;
+            }
+
+                _unitOfWork.Customers.UpdateCustomer(existingCustomer);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
 
     }
 }

@@ -2,11 +2,11 @@
 {
     public interface ICustomerRepository
     {
-        Task AddCustomerAsync(CustomerEntity customer);
-        void Update(CustomerEntity customer);
         Task<IEnumerable<CustomerEntity>> GetAllAsync();
         Task<CustomerEntity> GetCustomerByEmailAsync(string email);
-        Task DeleteCustomerAsync(CustomerEntity deleteCustomer);
+        Task AddCustomerAsync(CustomerEntity customer);
+        void UpdateCustomer(CustomerEntity customer);
+        void DeleteCustomer(CustomerEntity deleteCustomer);
 
     }
 }

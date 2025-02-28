@@ -55,12 +55,7 @@ namespace Web_Labb2.Controllers
 
         }
 
-        // PUT api/<CustomerController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
+      
         // DELETE api/<CustomerController>/5
         [HttpDelete("{email}")]
         public async Task<ActionResult> DeleteCustomerByEmail(string email)
@@ -69,7 +64,34 @@ namespace Web_Labb2.Controllers
             {
                 return BadRequest("You need to input a correct email.");
             }
-            return Ok(await _customerService.DeleteCustomerByEmail(email));
+            var result = await _customerService.DeleteCustomerByEmail(email);
+            if(!result)
+            {
+                return NotFound("No user with that email exist.");
+            }
+            return Ok($"Deleted user with email: {email}");
+        }
+
+
+        [HttpPut("{email}")]
+        public async Task<ActionResult> UpdateCustomerByEmail(string email, [FromBody] CustomerDTO updatedCustomer)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return NotFound("No user with that email exist.");
+            }
+            else if (string.IsNullOrEmpty(updatedCustomer.FirstName) || string.IsNullOrEmpty(updatedCustomer.LastName) || string.IsNullOrEmpty(updatedCustomer.Email))
+            {
+                return BadRequest("You need to add updated information.");
+            }
+
+            var result = await _customerService.UpdateCustomerByEmail(email, updatedCustomer);
+            if (!result)
+            {
+                return NotFound("Customer not found or update failed.");
+            }
+
+            return Ok("Customer is updated successfully.");
         }
     }
 }

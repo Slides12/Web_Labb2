@@ -8,14 +8,12 @@ namespace Web_Labb2.Data
 
         public ICustomerRepository Customers { get; private set; }
         public IProductRepository Products { get; private set; }
-        public IAdressRepository Addresses { get; private set; }
 
         public UnitOfWork(APIDBContext context)
         {
             _context = context;
             Customers = new CustomerRepository(_context);
-            //Products = new ProductRepository(_context);
-            //Addresses = new AdressRepository(_context);
+            Products = new ProductRepository(_context);
         }
 
         public async Task<int> SaveChangesAsync()
