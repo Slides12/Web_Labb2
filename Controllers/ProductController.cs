@@ -26,29 +26,71 @@ namespace Web_Labb2.Controllers
         }
 
         // GET api/<ProductController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("id/{id}")]
+        public async Task<ActionResult<ProductDTO>>GetProductById(string id)
         {
-            return "value";
+            var result = await _productService.GetProductById(id);
+            if(result == null)
+            {
+                return NotFound("There is no product by this number.");
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("name/{name}")]
+        public async Task<ActionResult<ProductDTO>> GetProductByName(string name)
+        {
+            var result = await _productService.GetProductByName(name);
+            if (result == null)
+            {
+                return NotFound("There is no product by this name.");
+            }
+            return Ok(result);
         }
 
         // POST api/<ProductController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ProductDTO newProduct)
         {
-            return Ok(await _productService.AddProductAsync(newProduct));
+            if (newProduct != null)
+            {
+                var result = await _productService.AddProductAsync(newProduct);
+                if (!result)
+                {
+                    return BadRequest("The product was null.");
+                }
+            }
+            return Created("Added to the DB", newProduct);
         }
 
         // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult> Put(string id, [FromBody] ProductDTO updatedProduct)
         {
+            if (string.IsNullOrEmpty(id)) return BadRequest("You need to enter a Product Id.");
+            if (updatedProduct == null) return BadRequest("You need to add data to be updated.");
+
+            var result = await _productService.UpdateProductAsync(id, updatedProduct);
+            if (!result)
+                return NotFound("Did not find a product by that id.");
+
+            return Ok("Product was updated successfully.");
         }
 
         // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult> Delete(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("You need to input a correct product Id.");
+            }
+            var result = await _productService.DeleteProductById(id);
+            if (!result)
+            {
+                return NotFound("No product with that Id exists.");
+            }
+            return Ok($"Deleted product with Id: {id}");
         }
     }
 }

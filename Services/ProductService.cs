@@ -27,6 +27,56 @@ namespace Web_Labb2.Services
             });
         }
 
+        public async Task<ProductDTO> GetProductById(string id)
+        {
+            try
+            {
+                var product = await _unitOfWork.Products.GetProductByProductNumberAsync(id);
+                if(product != null)
+                {
+                    return new ProductDTO() 
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        ProductCategory = product.ProductCategory,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Status = product.Status
+                    };
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred while retrieving the product.", ex);
+            }
+        }
+
+        public async Task<ProductDTO> GetProductByName(string name)
+        {
+            try
+            {
+                var product = await _unitOfWork.Products.GetProductByProductNameAsync(name);
+                if (product != null)
+                {
+                    return new ProductDTO()
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        ProductCategory = product.ProductCategory,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Status = product.Status
+                    };
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred while retrieving the product.", ex);
+            }
+        }
+
 
         public async Task<bool> AddProductAsync(ProductDTO newProduct)
         {
@@ -43,6 +93,42 @@ namespace Web_Labb2.Services
                 Status = newProduct.Status
             });
 
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+
+        public async Task<bool> UpdateProductAsync(string id, ProductDTO updatedProduct)
+        {
+            if (updatedProduct == null) return false;
+            var existingProduct = await _unitOfWork.Products.GetProductByProductNumberAsync(id);
+            if (existingProduct == null) return false;
+
+            existingProduct.ProductName = string.IsNullOrEmpty(updatedProduct.ProductName) ? existingProduct.ProductName : updatedProduct.ProductName;
+            existingProduct.Description = string.IsNullOrEmpty(updatedProduct.Description) ? existingProduct.Description : updatedProduct.Description;
+            existingProduct.ProductCategory = string.IsNullOrEmpty(updatedProduct.ProductCategory) ? existingProduct.ProductCategory : updatedProduct.ProductCategory;
+
+            if (updatedProduct.Price > 1)
+            {
+                existingProduct.Price = updatedProduct.Price;
+            }
+
+
+            _unitOfWork.Products.UpdateProduct(existingProduct);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<bool> DeleteProductById(string id)
+        {
+
+            var product = await _unitOfWork.Products.GetProductByProductNumberAsync(id);
+            if (product is null)
+            {
+                return false;
+            }
+            _unitOfWork.Products.DeleteProduct(product);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }

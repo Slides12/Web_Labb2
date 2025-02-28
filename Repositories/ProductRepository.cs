@@ -34,7 +34,7 @@ namespace Web_Labb2.Repositories
 
         public async Task<ProductEntity> GetProductByProductNumberAsync(string productId)
         {
-            return await _context.ProductEntitys.FirstOrDefaultAsync(p => p.ProductId == productId);
+            return await _context.ProductEntitys.FirstOrDefaultAsync(p => p.ProductId.ToLower() == productId.ToLower());
         }
 
         public void UpdateProduct(ProductEntity updateProduct)

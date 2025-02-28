@@ -111,21 +111,18 @@ namespace Web_Labb2.Services
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(updatedCustomer.FirstName))
-                existingCustomer.FirstName = updatedCustomer.FirstName;
+                existingCustomer.FirstName = string.IsNullOrEmpty(updatedCustomer.FirstName) ? existingCustomer.FirstName : updatedCustomer.FirstName;
+                existingCustomer.LastName = string.IsNullOrEmpty(updatedCustomer.LastName) ? existingCustomer.LastName : updatedCustomer.LastName;
+                existingCustomer.PhoneNumber = string.IsNullOrEmpty(updatedCustomer.PhoneNumber) ? existingCustomer.PhoneNumber : updatedCustomer.PhoneNumber;
 
-            if (!string.IsNullOrEmpty(updatedCustomer.LastName))
-                existingCustomer.LastName = updatedCustomer.LastName;
 
-            if (!string.IsNullOrEmpty(updatedCustomer.PhoneNumber))
-                existingCustomer.PhoneNumber = updatedCustomer.PhoneNumber;
 
             if (updatedCustomer.AddressInformation != null)
             {
-                existingCustomer.AddressInformation.Address = updatedCustomer.AddressInformation.Address;
-                existingCustomer.AddressInformation.PostNumber = updatedCustomer.AddressInformation.PostNumber;
-                existingCustomer.AddressInformation.City = updatedCustomer.AddressInformation.City;
-                existingCustomer.AddressInformation.Country = updatedCustomer.AddressInformation.Country;
+                existingCustomer.AddressInformation.Address = string.IsNullOrEmpty(updatedCustomer.AddressInformation.Address) ? existingCustomer.AddressInformation.Address : updatedCustomer.AddressInformation.Address;
+                existingCustomer.AddressInformation.PostNumber = string.IsNullOrEmpty(updatedCustomer.AddressInformation.PostNumber) ? existingCustomer.AddressInformation.PostNumber : updatedCustomer.AddressInformation.PostNumber;
+                existingCustomer.AddressInformation.City = string.IsNullOrEmpty(updatedCustomer.AddressInformation.City) ? existingCustomer.AddressInformation.City : updatedCustomer.AddressInformation.City;
+                existingCustomer.AddressInformation.Country = string.IsNullOrEmpty(updatedCustomer.AddressInformation.Country) ? existingCustomer.AddressInformation.Country : updatedCustomer.AddressInformation.Country;
             }
 
                 _unitOfWork.Customers.UpdateCustomer(existingCustomer);
