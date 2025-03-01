@@ -120,6 +120,16 @@ namespace Web_Labb2.Services
 
         }
 
+        public async Task<bool> UpdateProductStatus(string id)
+        {
+            var existingProduct = await _unitOfWork.Products.GetProductByProductNumberAsync(id);
+            if (existingProduct == null) return false;
+            existingProduct.Status = !existingProduct.Status;
+            _unitOfWork.Products.UpdateProduct(existingProduct);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> DeleteProductById(string id)
         {
 

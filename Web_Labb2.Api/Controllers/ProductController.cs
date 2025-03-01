@@ -50,7 +50,7 @@ namespace Web_Labb2.Controllers
 
         // POST api/<ProductController>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ProductDTO newProduct)
+        public async Task<ActionResult> PostProduct([FromBody] ProductDTO newProduct)
         {
             if (newProduct != null)
             {
@@ -65,7 +65,7 @@ namespace Web_Labb2.Controllers
 
         // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(string id, [FromBody] ProductDTO updatedProduct)
+        public async Task<ActionResult> PutAllInfo(string id, [FromBody] ProductDTO updatedProduct)
         {
             if (string.IsNullOrEmpty(id)) return BadRequest("You need to enter a Product Id.");
             if (updatedProduct == null) return BadRequest("You need to add data to be updated.");
@@ -77,9 +77,22 @@ namespace Web_Labb2.Controllers
             return Ok("Product was updated successfully.");
         }
 
+        // PUT api/<ProductController>/5
+        [HttpPut("status/{id}")]
+        public async Task<ActionResult> PutStatus(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest("You need to enter a Product Id.");
+
+            var result = await _productService.UpdateProductStatus(id);
+            if (!result)
+                return NotFound("Did not find a product by that id.");
+
+            return Ok("Product was updated successfully.");
+        }
+
         // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> DeleteProduct(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
