@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Web_Labb2.Shared.Models;
 
 public class APIDBContext : DbContext
 {
@@ -9,5 +10,6 @@ public class APIDBContext : DbContext
     public DbSet<AddressEntity> AdressEntitys { get; set; }
     public DbSet<CustomerEntity> CustomerEntitys { get; set; }
     public DbSet<ProductEntity> ProductEntitys { get; set; }
+    public DbSet<User> UserEntitys { get; set; }
 
 }

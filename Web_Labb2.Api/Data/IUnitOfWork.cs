@@ -1,4 +1,5 @@
-﻿using Web_Labb2.Repositories;
+﻿using Web_Labb2.Api.Repositories;
+using Web_Labb2.Repositories;
 
 namespace Web_Labb2.Data
 {
@@ -6,6 +7,7 @@ namespace Web_Labb2.Data
     {
         ICustomerRepository Customers { get; }
         IProductRepository Products { get; }
+        IUserRepository Users { get; }
 
 
         Task<int> SaveChangesAsync();
