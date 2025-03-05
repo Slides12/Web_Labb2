@@ -22,7 +22,7 @@ namespace Web_Labb2.Api.Services
             _unitOfWork = unitOfWork;
             var options = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
 
-            _jwtSecret = options["connectionString"];
+            _jwtSecret = options["jwtKey"];
             _issuer = config["JwtSettings:Issuer"];
             _audience = config["JwtSettings:Audience"];
         }
@@ -67,11 +67,12 @@ namespace Web_Labb2.Api.Services
 
         private bool VerifyPassword(string password, string hashedPassword)
         {
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_jwtSecret));
-            var hash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
+            var hasher = new PasswordHasher<User>();
+            var verificationResult = hasher.VerifyHashedPassword(new User(), hashedPassword, password);
 
-            return hash == hashedPassword;
+            return verificationResult == PasswordVerificationResult.Success;
         }
+
 
 
         public async Task<User?> RegisterAsync(UserDTO request)

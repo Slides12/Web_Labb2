@@ -10,9 +10,9 @@ namespace Web_Labb2.Api.Controllers
     public class AuthController : Controller
     {
 
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
@@ -27,6 +27,7 @@ namespace Web_Labb2.Api.Controllers
                 return Unauthorized();
 
             var token = _authService.GenerateJwtToken(user.Username, result.Role);
+            result.Token = token;
             return Ok(result);
         }
 
