@@ -77,11 +77,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<APIDBContext>();
-    DbInitializer.Seed(context);
-}
+
 
 app.UseHttpsRedirection();
 

@@ -10,7 +10,7 @@ namespace Web_Labb2.Data
         public ICustomerRepository Customers { get; private set; }
         public IProductRepository Products { get; private set; }
         public IUserRepository Users { get; set; }
-
+        public IOrderRepository Orders { get; set; }
 
         public UnitOfWork(APIDBContext context)
         {

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Web_Labb2.Shared.Models;
 
 public class ProductEntity
 {
@@ -10,4 +11,5 @@ public class ProductEntity
     public decimal Price { get; set; }
     public required string ProductCategory { get; set; }
     public bool Status { get; set; }
+    public List<OrderDetail> OrderDetails { get; set; }
 }

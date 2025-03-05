@@ -8,6 +8,7 @@ namespace Web_Labb2.Data
         ICustomerRepository Customers { get; }
         IProductRepository Products { get; }
         IUserRepository Users { get; }
+        IOrderRepository Orders { get; }
 
 
         Task<int> SaveChangesAsync();
