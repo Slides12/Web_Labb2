@@ -6,6 +6,12 @@ namespace Web_Labb2.Api.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+
+        public OrderService(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
         public Task CreateOrderAsync(OrderInfo order)
         {
             throw new NotImplementedException();
