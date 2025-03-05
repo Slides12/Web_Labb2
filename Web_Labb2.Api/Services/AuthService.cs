@@ -10,7 +10,7 @@ using Web_Labb2.Shared.Models;
 
 namespace Web_Labb2.Api.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly string _jwtSecret;

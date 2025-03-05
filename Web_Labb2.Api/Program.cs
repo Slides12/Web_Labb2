@@ -56,9 +56,9 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<CustomerService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IAuthService,AuthService>();
 
 
 

@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Web_Labb2.Api.Services;
 using Web_Labb2.Data;
 using Web_Labb2.DTO_s;
 
 
 namespace Web_Labb2.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
         private readonly IUnitOfWork _unitOfWork;
 

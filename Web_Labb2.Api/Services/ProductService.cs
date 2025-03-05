@@ -1,9 +1,10 @@
-﻿using Web_Labb2.Data;
+﻿using Web_Labb2.Api.Services;
+using Web_Labb2.Data;
 using Web_Labb2.DTO_s;
 
 namespace Web_Labb2.Services
 {
-    public class ProductService
+    public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
 
