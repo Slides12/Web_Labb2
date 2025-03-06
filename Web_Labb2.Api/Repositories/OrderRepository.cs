@@ -6,9 +6,10 @@ namespace Web_Labb2.Api.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly APIDBContext _context;
-        public async Task CreateOrderAsync(OrderInfo order)
+        public async Task<OrderInfo> CreateOrderAsync(OrderInfo order)
         {
             await _context.Orders.AddAsync(order);
+            return order;
         }
 
         public void DeleteOrderAsync(OrderInfo order)
@@ -19,6 +20,11 @@ namespace Web_Labb2.Api.Repositories
         public async Task<IEnumerable<OrderInfo>> GetAllOrdersAsync()
         {
             return await _context.Orders.Include(o => o.OrderDetails).ToListAsync();
+        }
+
+        public async Task<OrderInfo> GetOrdersByIdAsync(int orderId)
+        {
+            return await _context.Orders.Include(o => o.OrderDetails).FirstOrDefaultAsync(o => o.OrderID == orderId);
         }
 
         public void UpdateOrderAsync(OrderInfo order)

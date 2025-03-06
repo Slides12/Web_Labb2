@@ -1,5 +1,7 @@
 ﻿using Web_Labb2.Data;
 using Web_Labb2.Shared.Models;
+using Web_Labb2.Shared.DTO_s;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_Labb2.Api.Services
 {
@@ -12,24 +14,88 @@ namespace Web_Labb2.Api.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task CreateOrderAsync(OrderInfo order)
+        public async Task<OrderDTO> CreateOrderAsync(OrderDTO order)
         {
-            throw new NotImplementedException();
+            if (order.CustomerID == 0 || order.OrderDetails == null)
+                return null;
+
+            var newOrder = new OrderInfo
+            {
+                CustomerID = order.CustomerID,
+                Customer = order.Customer,
+                OrderDate = order.OrderDate,
+                TotalAmount = order.TotalAmount,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetail
+                {
+                    ProductID = od.ProductID,
+                    Quantity = od.Quantity,
+                    Price = od.Price
+                }).ToList()
+            };
+
+            var createdOrder = await _unitOfWork.Orders.CreateOrderAsync(newOrder);
+
+            return new OrderDTO
+            {
+                CustomerID = createdOrder.CustomerID,
+                OrderDate = createdOrder.OrderDate,
+                TotalAmount = createdOrder.TotalAmount,
+                Customer = createdOrder.Customer,
+                OrderDetails = createdOrder.OrderDetails
+            };
         }
 
-        public void DeleteOrderAsync(OrderInfo order)
+
+        public async Task DeleteOrderAsync(OrderDTO order)
         {
-            throw new NotImplementedException();
+            var deleteOrder = await GetOrderById(order.OrderID);
+            if (deleteOrder != null)
+            {
+                _unitOfWork.Orders.DeleteOrderAsync(deleteOrder);
+                await _unitOfWork.SaveChangesAsync();
+            }
         }
 
-        public Task<IEnumerable<OrderInfo>> GetAllOrdersAsync()
+        public Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
         {
-            throw new NotImplementedException();
+            return _unitOfWork.Orders.GetAllOrdersAsync();
         }
 
-        public void UpdateOrderAsync(OrderInfo order)
+        public Task<OrderInfo> GetOrderById(int order)
         {
-            throw new NotImplementedException();
+            var getOrder = _unitOfWork.Orders.GetOrdersByIdAsync(order);
+            if (getOrder != null)
+            {
+                return getOrder;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        public void UpdateOrderAsync(OrderDTO order)
+        {
+            if (order.CustomerID != 0 || order.OrderDetails != null)
+            {
+                var newOrder = new OrderInfo
+                {
+                    CustomerID = order.CustomerID,
+                    Customer = order.Customer,
+                    OrderDate = order.OrderDate,
+                    TotalAmount = order.TotalAmount,
+                    OrderDetails = order.OrderDetails.Select(od => new OrderDetail
+                    {
+                        ProductID = od.ProductID,
+                        Quantity = od.Quantity,
+                        Price = od.Price
+                    }).ToList()
+                };
+
+                _unitOfWork.Orders.UpdateOrderAsync(newOrder);
+            }
+                
         }
     }
 }
