@@ -6,6 +6,12 @@ namespace Web_Labb2.Api.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly APIDBContext _context;
+
+        public OrderRepository(APIDBContext context)
+        {
+            _context = context;
+        }
+
         public async Task<OrderInfo> CreateOrderAsync(OrderInfo order)
         {
             await _context.Orders.AddAsync(order);

@@ -19,10 +19,12 @@ namespace Web_Labb2.Api.Services
             if (order.CustomerID == 0 || order.OrderDetails == null)
                 return null;
 
+            
+            order.OrderDate = DateTime.UtcNow;
+
             var newOrder = new OrderInfo
             {
                 CustomerID = order.CustomerID,
-                Customer = order.Customer,
                 OrderDate = order.OrderDate,
                 TotalAmount = order.TotalAmount,
                 OrderDetails = order.OrderDetails.Select(od => new OrderDetail
@@ -34,21 +36,21 @@ namespace Web_Labb2.Api.Services
             };
 
             var createdOrder = await _unitOfWork.Orders.CreateOrderAsync(newOrder);
+            await _unitOfWork.SaveChangesAsync();
 
             return new OrderDTO
             {
                 CustomerID = createdOrder.CustomerID,
                 OrderDate = createdOrder.OrderDate,
                 TotalAmount = createdOrder.TotalAmount,
-                Customer = createdOrder.Customer,
-                OrderDetails = createdOrder.OrderDetails
             };
         }
 
 
-        public async Task DeleteOrderAsync(OrderDTO order)
+
+        public async Task DeleteOrderAsync(int order)
         {
-            var deleteOrder = await GetOrderById(order.OrderID);
+            var deleteOrder = await GetOrderById(order);
             if (deleteOrder != null)
             {
                 _unitOfWork.Orders.DeleteOrderAsync(deleteOrder);
@@ -56,9 +58,17 @@ namespace Web_Labb2.Api.Services
             }
         }
 
-        public Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
+        public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
         {
-            return _unitOfWork.Orders.GetAllOrdersAsync();
+            var orders = await  _unitOfWork.Orders.GetAllOrdersAsync();
+
+            return orders.Select(o => new OrderDTO
+            {
+                OrderID = o.OrderID,
+                CustomerID = o.CustomerID,
+                OrderDate = o.OrderDate,
+                TotalAmount = o.TotalAmount,
+            });
         }
 
         public Task<OrderInfo> GetOrderById(int order)
@@ -75,27 +85,46 @@ namespace Web_Labb2.Api.Services
         }
 
 
-        public void UpdateOrderAsync(OrderDTO order)
+        public async Task<OrderDTO> UpdateOrderAsync(OrderDTO order)
         {
-            if (order.CustomerID != 0 || order.OrderDetails != null)
+            if (order.CustomerID == 0 || order.OrderDetails == null || !order.OrderDetails.Any())
             {
-                var newOrder = new OrderInfo
-                {
-                    CustomerID = order.CustomerID,
-                    Customer = order.Customer,
-                    OrderDate = order.OrderDate,
-                    TotalAmount = order.TotalAmount,
-                    OrderDetails = order.OrderDetails.Select(od => new OrderDetail
-                    {
-                        ProductID = od.ProductID,
-                        Quantity = od.Quantity,
-                        Price = od.Price
-                    }).ToList()
-                };
-
-                _unitOfWork.Orders.UpdateOrderAsync(newOrder);
+                throw new ArgumentException("Invalid order data. CustomerID and OrderDetails are required.");
             }
-                
+
+            var existingOrder = await _unitOfWork.Orders.GetOrdersByIdAsync(order.OrderID);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {order.OrderID} not found.");
+            }
+
+            existingOrder.CustomerID = order.CustomerID;
+            existingOrder.OrderDate = order.OrderDate;
+            existingOrder.TotalAmount = order.TotalAmount;
+            existingOrder.OrderDetails = order.OrderDetails.Select(od => new OrderDetail
+            {
+                ProductID = od.ProductID,
+                Quantity = od.Quantity,
+                Price = od.Price
+            }).ToList();
+
+            _unitOfWork.Orders.UpdateOrderAsync(existingOrder);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new OrderDTO
+            {
+                OrderID = existingOrder.OrderID,
+                CustomerID = existingOrder.CustomerID,
+                OrderDate = existingOrder.OrderDate,
+                TotalAmount = existingOrder.TotalAmount,
+                OrderDetails = existingOrder.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    ProductID = od.ProductID,
+                    Quantity = od.Quantity,
+                    Price = od.Price
+                }).ToList()
+            };
         }
+
     }
 }

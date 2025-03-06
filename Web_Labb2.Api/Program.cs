@@ -55,10 +55,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService,ProductService>();
 builder.Services.AddScoped<IAuthService,AuthService>();
+builder.Services.AddScoped<IOrderService,OrderService>();
 
 
 

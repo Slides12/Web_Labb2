@@ -8,7 +8,7 @@ namespace Web_Labb2.Api.Services
         public Task<IEnumerable<OrderDTO>> GetAllOrdersAsync();
         public Task<OrderDTO> CreateOrderAsync(OrderDTO order);
         public Task<OrderInfo> GetOrderById(int order);
-        public void UpdateOrderAsync(OrderDTO order);
-        public Task DeleteOrderAsync(OrderDTO order);
+        public Task<OrderDTO> UpdateOrderAsync(OrderDTO order);
+        public Task DeleteOrderAsync(int order);
     }
 }

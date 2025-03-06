@@ -18,6 +18,7 @@ namespace Web_Labb2.Data
             Customers = new CustomerRepository(_context);
             Products = new ProductRepository(_context);
             Users = new UserRepository(_context);
+            Orders = new OrderRepository(_context);
         }
 
         public async Task<int> SaveChangesAsync()

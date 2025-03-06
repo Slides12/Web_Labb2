@@ -29,27 +29,66 @@ namespace Web_Labb2.Api.Controllers
 
         // GET api/<OrderController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<CustomerDTO>> GetOrderById(int id)
         {
-            return "value";
+            var result = await _orderService.GetOrderById(id);
+            if (result == null)
+            {
+                return BadRequest("Order not found");
+            }
+
+            return Ok(result);
         }
 
         // POST api/<OrderController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult> CreateOrder([FromBody] OrderDTO value)
         {
+            if (value == null || value.CustomerID == 0 || value.OrderDetails == null || value.OrderDetails.Count == 0)
+            {
+                return BadRequest("Invalid order data. CustomerID and OrderDetails are required.");
+            }
+
+            var result = await _orderService.CreateOrderAsync(value);
+            if (result == null)
+            {
+                return BadRequest("Failed to create order. Please check the provided details.");
+            }
+
+            return CreatedAtAction(nameof(GetOrderById), new { id = result.OrderID }, result);
         }
+
 
         // PUT api/<OrderController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult> UpdateCustomerByEmail(int id, [FromBody] OrderDTO updatedOrder)
         {
+            
+            if (updatedOrder.OrderID == null || updatedOrder.CustomerID == null || updatedOrder.OrderDetails == null)
+            {
+                return BadRequest("You need to add updated information.");
+            }
+
+            var result = await _orderService.UpdateOrderAsync(updatedOrder);
+            if (result == null)
+            {
+                return NotFound("Order not found or update failed.");
+            }
+
+            return Ok("Order is updated successfully.");
         }
 
         // DELETE api/<OrderController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult> DeleteCustomerByEmail(int id)
         {
+            if (id == null)
+            {
+                return BadRequest("You need to input a correct id.");
+            }
+            await _orderService.DeleteOrderAsync(id);
+           
+            return Ok($"Deleted user with email: {id}");
         }
     }
 }

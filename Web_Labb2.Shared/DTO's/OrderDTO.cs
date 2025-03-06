@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Web_Labb2.Shared.Models;
+using Web_Labb2.DTO_s;
 
 namespace Web_Labb2.Shared.DTO_s
 {
@@ -13,11 +14,11 @@ namespace Web_Labb2.Shared.DTO_s
     {
         public int OrderID { get; set; }
         public int CustomerID { get; set; }
-        public DateTime OrderDate { get; set; } = DateTime.Now;
+        public DateTime OrderDate { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }
 
-        public CustomerEntity Customer { get; set; }
-        public List<OrderDetail> OrderDetails { get; set; }
+        public CustomerDTO Customer { get; set; }
+        public List<OrderDetailDTO> OrderDetails { get; set; } = new List<OrderDetailDTO>();
     }
 }
