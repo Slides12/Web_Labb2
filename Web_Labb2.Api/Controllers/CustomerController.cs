@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Web_Labb2.Api.Services;
 using Web_Labb2.DTO_s;
 using Web_Labb2.Services;
 
@@ -11,9 +12,9 @@ namespace Web_Labb2.Controllers
     public class CustomerController : ControllerBase
     {
 
-        private readonly CustomerService _customerService;
+        private readonly ICustomerService _customerService;
 
-        public CustomerController(CustomerService customerService)
+        public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
         }

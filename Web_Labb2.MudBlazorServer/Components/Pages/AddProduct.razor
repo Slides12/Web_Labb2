@@ -1,0 +1,76 @@
+﻿@page "/addproduct"
+@inject HttpClient Http
+
+
+<EditForm Model="@productData" OnValidSubmit="SubmitForm">
+    <DataAnnotationsValidator />
+    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Product Name" HelperText="Max. 8 characters"
+                                  @bind-Value="productData.ProductName" For="@(() => productData.ProductName)" />
+                    <MudTextField Label="Price" HelperText="5999" Class="mt-3"
+                                  @bind-Value="productData.Price" For="@(() => productData.Price)" InputType="InputType.Number" />
+                    <MudTextField Label="ProductId" HelperText="SerialNumber" Class="mt-3"
+                                  @bind-Value="productData.ProductId" For="@(() => productData.ProductId)" InputType="InputType.Text" />
+                    <MudTextField Label="Description" HelperText="Type a Description" Class="mt-3"
+                                  @bind-Value="productData.Description" For="@(() => productData.Description)" InputType="InputType.Text" />
+                    <MudTextField Label="Category" HelperText="Add a category" Class="mt-3"
+                                  @bind-Value="productData.ProductCategory" For="@(() => productData.ProductCategory)" InputType="InputType.Text" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private ProductDTO productData = new ProductDTO() { ProductCategory = "", ProductId= "", ProductName = ""};
+    bool success;
+
+    private async Task SubmitForm()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7218/api/Product", productData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Product registered successfully!");
+                success = true;
+                StateHasChanged();
+            }
+            else
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {response.ReasonPhrase}, Details: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+}
+
+
+
+

@@ -48,6 +48,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorClient",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7107")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
 
 
 builder.Services.AddAuthorization();
@@ -79,7 +90,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-
+app.UseCors("AllowBlazorClient");
 
 app.UseHttpsRedirection();
 

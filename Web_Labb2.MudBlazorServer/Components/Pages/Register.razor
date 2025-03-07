@@ -1,0 +1,72 @@
+﻿@page "/register"
+@inject HttpClient Http
+
+
+<EditForm Model="@userData" OnValidSubmit="SubmitForm">
+    <DataAnnotationsValidator />
+    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="First name" HelperText="Max. 8 characters"
+                                  @bind-Value="userData.Username" For="@(() => userData.Username)" />
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                                  @bind-Value="userData.Password" For="@(() => userData.Password)" InputType="InputType.Password" />
+                    <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"
+                                  @bind-Value="userData.ConfirmPassword" For="@(() => userData.ConfirmPassword)" InputType="InputType.Password" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+      
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private UserDTO userData = new UserDTO();
+    bool success;
+
+    private async Task SubmitForm()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7218/api/Auth/register", userData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("User registered successfully!");
+                success = true;
+                StateHasChanged();
+            }
+            else
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {response.ReasonPhrase}, Details: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+}
+
+
+
+

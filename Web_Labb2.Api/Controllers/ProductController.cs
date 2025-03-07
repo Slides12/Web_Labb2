@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Web_Labb2.Api.Services;
 using Web_Labb2.DTO_s;
 using Web_Labb2.Services;
 
@@ -10,9 +11,9 @@ namespace Web_Labb2.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly ProductService _productService;
+        private readonly IProductService _productService;
 
-        public ProductController(ProductService productService)
+        public ProductController(IProductService productService)
         {
             _productService = productService;
         }
