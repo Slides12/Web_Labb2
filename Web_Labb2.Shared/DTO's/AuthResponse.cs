@@ -8,6 +8,8 @@ namespace Web_Labb2.Shared.DTO_s
 {
     public class AuthResponse
     {
-        public string Token { get; set; }
+        public string? Username { get; set; }
+        public string? Role { get; set; }
+        public string? Token { get; set; }
     }
 }
