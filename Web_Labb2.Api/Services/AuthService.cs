@@ -50,7 +50,7 @@ namespace Web_Labb2.Api.Services
         }
 
 
-        public async Task<AuthResult> ValidateUser(UserDTO request)
+        public async Task<AuthResult> ValidateUser(LoginDTO request)
         {
 
             var user = await _unitOfWork.Users.GetUserByUsernameAsync(request.Username);

@@ -1,0 +1,17 @@
+﻿@page "/dashboard"
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Welcome to the Dashboard</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Admin content goes here</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    // Your component code
+}

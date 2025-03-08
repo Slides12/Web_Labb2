@@ -1,0 +1,97 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory ClientFactory
+@inject ILogger<Login> Logger
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="username">Username</label>
+        <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password" />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+</EditForm>
+
+@if (loginError)
+{
+    <div class="alert alert-danger">
+        Invalid login attempt.
+    </div>
+}
+
+@code {
+    private LoginDTO loginModel = new LoginDTO();
+    private bool loginError = false;
+    private bool isInitialized = false;
+    private string? token;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            Logger.LogInformation($"Login attempt for user: {loginModel.Username}");
+
+            var client = ClientFactory.CreateClient("AuthorizedClient");
+
+            var response = await client.PostAsJsonAsync("api/Auth/login", loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var authResult = await response.Content.ReadFromJsonAsync<AuthResult>();
+
+                if (authResult != null && authResult.IsValid)
+                {
+                    token = authResult.Token;
+
+                    // Redirect to another page, e.g., Dashboard
+                    NavigationManager.NavigateTo("/dashboard");
+                }
+                else
+                {
+                    loginError = true;
+                }
+            }
+            else
+            {
+                // Log the error message and the response content
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                Logger.LogError($"Error response: {errorResponse}");
+                loginError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error: {ex.Message}");
+            loginError = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            isInitialized = true;
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                await LocalStorage.SetItemAsync("authToken", token);
+                token = null;
+            }
+        }
+    }
+}

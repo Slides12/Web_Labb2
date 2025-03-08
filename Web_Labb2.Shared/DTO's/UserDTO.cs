@@ -17,7 +17,6 @@ namespace Web_Labb2.Shared.DTO_s
         [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
         public string Password { get; set; }
 
-        [Required]
         [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; }
 

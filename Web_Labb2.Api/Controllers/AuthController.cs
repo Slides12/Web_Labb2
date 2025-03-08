@@ -19,7 +19,7 @@ namespace Web_Labb2.Api.Controllers
 
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] UserDTO user)
+        public async Task<ActionResult> Login([FromBody] LoginDTO user)
         {
             var result = await _authService.ValidateUser(user);
 
