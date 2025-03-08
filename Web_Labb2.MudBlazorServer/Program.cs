@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using Web_Labb2.MudBlazorServer.Components;
@@ -14,6 +15,17 @@ builder.Services.AddAuthorizationCore();
 
 
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.AddPolicy("AllowAnonymous", policy =>
+        policy.RequireAssertion(context => true)); // Allow all for login page
+});
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -19,17 +20,23 @@ namespace Web_Labb2.MudBlazorServer.Providers
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = await _localStorage.GetItemAsync<string>("jwt_token");
-            var identity = new ClaimsIdentity();
-
-            if(!string.IsNullOrEmpty(token))
+            // Avoid using JavaScript interop during prerendering phase
+            if (NavigationManager.IsNavigationIntercepted)
             {
-                identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
-                _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
-            var user = new ClaimsPrincipal(identity);
+
+            var token = await _localStorage.GetItemAsync<string>("jwt_token");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"));
             return new AuthenticationState(user);
         }
+
 
         public async Task MarkUserAsAuthenticated(string token)
         {

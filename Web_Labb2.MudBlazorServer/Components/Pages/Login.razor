@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@attribute [Authorize(Policy = "AllowAnonymous")]
 @inject HttpClient http
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
