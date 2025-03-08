@@ -34,8 +34,8 @@
 
             if (!string.IsNullOrEmpty(authResult.Token))
             {
-                await LocalStorage.SetItemAsync("authToken", authResult.Token);
-                Console.WriteLine($"Token Saved: {authResult.Token}"); // DEBUG: Print token
+                await LocalStorage.SetItemAsync("authToken", authResult.Token); // Store token in LocalStorage
+                Console.WriteLine($"Token Saved: {authResult.Token}"); // Debugging
             }
 
             Navigation.NavigateTo("/securepage");
@@ -45,5 +45,4 @@
             Console.WriteLine("Login failed.");
         }
     }
-
 }

@@ -11,20 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var options = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
-var jwtKey = options["jwtKey"];
-var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
-var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+// JWT Configuration from appsettings
+var config = builder.Configuration;
+var jwtKey = config["JwtSettings:Key"];
+var issuer = config["JwtSettings:Issuer"];
+var audience = config["JwtSettings:Audience"];
 
-// Check if the configuration values are not null or empty
+// Ensure jwtKey is not null or empty
 if (string.IsNullOrEmpty(jwtKey))
-    throw new ArgumentNullException(nameof(jwtKey), "jwtKey is not configured.");
-if (string.IsNullOrEmpty(jwtIssuer))
-    throw new ArgumentNullException(nameof(jwtIssuer), "JwtSettings:Issuer is not configured.");
-if (string.IsNullOrEmpty(jwtAudience))
-    throw new ArgumentNullException(nameof(jwtAudience), "JwtSettings:Audience is not configured.");
+{
+    throw new InvalidOperationException("JWT Key is not configured.");
+}
 
-// Configure JWT Authentication
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -34,18 +33,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = key
         };
     });
 
+// Add Authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAuthenticatedUser", policy => policy.RequireAuthenticatedUser());
 });
 
-// Configure HttpClient
+// Register HttpClient
 builder.Services.AddScoped<HttpClient>(sp =>
 {
     var client = new HttpClient { BaseAddress = new Uri("https://localhost:7218/") };
@@ -54,28 +54,29 @@ builder.Services.AddScoped<HttpClient>(sp =>
     return client;
 });
 
-
+// Register Blazored LocalStorage service
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<AuthorizationHandler>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
-}
-
+// Middleware for Authentication & Authorization
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
 
+// Ensure correct middleware order
+app.UseAuthentication(); // Make sure authentication is before authorization
+app.UseAuthorization();  // Authorization will work after authentication
+
+// Add anti-forgery middleware to handle CSRF protection
 app.UseAntiforgery();
 
+// Optional: If you are using CORS, enable it if needed
+// app.UseCors("AllowAllOrigins"); // Uncomment if needed
+
+// Map Razor Components and Interactive Server Render Mode
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

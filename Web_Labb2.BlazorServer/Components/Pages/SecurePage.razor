@@ -1,26 +1,13 @@
 ﻿@page "/securepage"
 @attribute [Authorize]
-@inject TokenService TokenService
 @inject HttpClient HttpClient
-@inject ILocalStorageService LocalStorage
-@rendermode InteractiveServer
 
 <h3>Secure Page</h3>
-
-<AuthorizeView>
-    <Authorized>
-        <p>Welcome, authenticated user!</p>
-    </Authorized>
-    <NotAuthorized>
-        <p>You are not authorized to view this page.</p>
-    </NotAuthorized>
-</AuthorizeView>
 
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await TokenService.AttachTokenAsync(); // Ensure token is attached to HttpClient
-
+        // Hämta data från skyddad API-ändpunkt
         var response = await HttpClient.GetAsync("https://localhost:7218/secure-endpoint");
 
         if (response.IsSuccessStatusCode)
@@ -30,8 +17,7 @@
         }
         else
         {
-            Console.WriteLine($"Error: {response.StatusCode}");
+            Console.WriteLine($"Error: {response.StatusCode}"); // Debugging för att se fel
         }
     }
-
 }
