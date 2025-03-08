@@ -1,8 +1,8 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
+using System.Text;
 using Web_Labb2.BlazorServer.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,48 +11,52 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+var options = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+var jwtKey = options["jwtKey"];
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+
+// Check if the configuration values are not null or empty
+if (string.IsNullOrEmpty(jwtKey))
+    throw new ArgumentNullException(nameof(jwtKey), "jwtKey is not configured.");
+if (string.IsNullOrEmpty(jwtIssuer))
+    throw new ArgumentNullException(nameof(jwtIssuer), "JwtSettings:Issuer is not configured.");
+if (string.IsNullOrEmpty(jwtAudience))
+    throw new ArgumentNullException(nameof(jwtAudience), "JwtSettings:Audience is not configured.");
+
+// Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:7218"; // Your API's base URL
-        options.Audience = "https://your-api.com";  // The API audience value
-        options.RequireHttpsMetadata = false; // Set to true in production
-
-        // Enable detailed logging
-        options.Events = new JwtBearerEvents
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            OnAuthenticationFailed = context =>
-            {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                logger.LogError("Authentication failed.", context.Exception);
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                logger.LogInformation("Token validated.", context.SecurityToken);
-                return Task.CompletedTask;
-            }
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireAuthenticatedUser", policy => policy.RequireAuthenticatedUser());
 });
 
-builder.Services.AddHttpClient();
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationService>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-
-builder.Services.AddScoped<AuthorizationMessageHandler>();
-
-builder.Services.AddHttpClient("AuthorizedClient", client =>
+// Configure HttpClient
+builder.Services.AddScoped<HttpClient>(sp =>
 {
-    client.BaseAddress = new Uri("https://localhost:7218/");
-}).AddHttpMessageHandler<AuthorizationMessageHandler>();
+    var client = new HttpClient { BaseAddress = new Uri("https://localhost:7218/") };
+    client.DefaultRequestHeaders.Accept.Clear();
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    return client;
+});
+
+
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
 
@@ -60,12 +64,13 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
