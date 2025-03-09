@@ -1,0 +1,53 @@
+﻿@page "/login"
+
+@inject APIClient APIClient
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="First name" HelperText="Max. 8 characters"
+                                  @bind-Value="loginModel.Username" For="@(() => loginModel.Username)" />
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                                  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+@code {
+    private LoginDTO loginModel = new LoginDTO();
+    bool success;
+
+    private async Task HandleLogin()
+    {
+        var res = await APIClient.PostAsync<AuthResult, LoginDTO>("https://localhost:7218/api/Auth/login", loginModel);
+        if(res != null && res.Token != null)
+        {
+            success = true;
+            ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
+            Navigation.NavigateTo("/admin");
+        }
+    }
+}
