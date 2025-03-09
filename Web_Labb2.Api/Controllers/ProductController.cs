@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Web_Labb2.Api.Services;
 using Web_Labb2.DTO_s;
 using Web_Labb2.Services;
@@ -50,6 +51,7 @@ namespace Web_Labb2.Controllers
         }
 
         // POST api/<ProductController>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> PostProduct([FromBody] ProductDTO newProduct)
         {
@@ -60,11 +62,17 @@ namespace Web_Labb2.Controllers
                 {
                     return BadRequest("The product was null.");
                 }
+
+                // Ensure the response content is correctly serialized to JSON
+                return CreatedAtAction(nameof(PostProduct), new { id = newProduct.ProductId }, newProduct);
             }
-            return Created("Added to the DB", newProduct);
+
+            return BadRequest("Invalid product data");
         }
 
+
         // PUT api/<ProductController>/5
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> PutAllInfo(string id, [FromBody] ProductDTO updatedProduct)
         {
@@ -79,6 +87,7 @@ namespace Web_Labb2.Controllers
         }
 
         // PUT api/<ProductController>/5
+        [Authorize(Roles = "Admin")]
         [HttpPut("status/{id}")]
         public async Task<ActionResult> PutStatus(string id)
         {
@@ -92,6 +101,7 @@ namespace Web_Labb2.Controllers
         }
 
         // DELETE api/<ProductController>/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(string id)
         {

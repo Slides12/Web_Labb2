@@ -1,0 +1,49 @@
+﻿@page "/products"
+@inject APIClient APIClient
+
+
+
+<PageTitle>Weather</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">All our products</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Show all our current products.</MudText>
+
+@if (products == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="products" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductDTO, object>(x=>x.ProductName)">Product Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.ProductId)">Product Id</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.Price)">Price</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.ProductCategory)">Product Category</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.Description!)">Description</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ProductName">@context.ProductName</MudTd>
+            <MudTd DataLabel="ProductId">@context.ProductId</MudTd>
+            <MudTd DataLabel="Price">@context.Price</MudTd>
+            <MudTd DataLabel="ProductCategory">@context.ProductCategory</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    private List<ProductDTO> products = new List<ProductDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+    }
+
+  
+}

@@ -11,12 +11,16 @@
         <MudSpacer />
         <AuthorizeView>
             <Authorized>
-                <MudText>Hello, @context.User.Identity?.Name!</MudText>
+                <MudStack Spacing="2" Row>
+                    <MudText>Hello, @context.User.Identity?.Name!  </MudText>
+                    <MudLink Href="/logout">Logout</MudLink>
+                </MudStack>
             </Authorized>
             <NotAuthorized>
-                <MudText>You're not authorized.</MudText>
+                <MudText> <a href="/login">Login</a></MudText>
             </NotAuthorized>
         </AuthorizeView>
+        
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>

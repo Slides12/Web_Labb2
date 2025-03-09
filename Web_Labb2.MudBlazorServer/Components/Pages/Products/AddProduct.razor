@@ -1,0 +1,64 @@
+﻿@page "/add-product"
+@inject APIClient APIClient
+
+<EditForm Model="@product" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Product Name" HelperText="Asus rog gaming PC."
+                    @bind-Value="product.ProductName" For="@(() => product.ProductName)" />
+                    <MudTextField Label="Price" Class="mt-3"
+                    @bind-Value="product.Price" For="@(() => product.Price)" />
+                    <MudTextField Label="Product Category" HelperText="Component" Class="mt-3"
+                    @bind-Value="product.ProductCategory" For="@(() => product.ProductCategory)" />
+                    <MudTextField Label="Product Id" HelperText="123898329" Class="mt-3"
+                    @bind-Value="product.ProductId" For="@(() => product.ProductId)" />
+                    <MudTextField Label="Description" HelperText="This PC is the ultimate gaming pc." Class="mt-3"
+                                  @bind-Value="product.Description" For="@(() => product.Description)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@code {
+    private ProductDTO product = new ProductDTO(){ ProductName = "", ProductCategory = "", ProductId = ""};
+    bool success;
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        try
+        {
+            await APIClient.PostAsync<string, ProductDTO>("https://localhost:7218/api/Product", product);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            success = false;
+        }
+        StateHasChanged();
+    }
+
+}
