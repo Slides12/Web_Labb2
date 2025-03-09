@@ -1,24 +1,21 @@
-using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Web_Labb2.BlazorServer;
+using Web_Labb2.BlazorServer.Authentication;
 using Web_Labb2.BlazorServer.Components;
-using Web_Labb2.BlazorServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-     .AddCircuitOptions(options => options.DetailedErrors = true);
-builder.Services.AddBlazoredLocalStorage();
+    .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthentication();
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddHttpClient<AuthService>(options =>
-{
-    options.BaseAddress = new Uri("https://localhost:7218/api/");
-});
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddScoped<APIClient>();
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -34,6 +31,9 @@ app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

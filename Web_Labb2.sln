@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Labb2.Api", "Web_Labb2.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Labb2.Shared", "Web_Labb2.Shared\Web_Labb2.Shared.csproj", "{96732607-ECAA-493B-ACBC-CEA364615B76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Labb2.BlazorServer", "Web_Labb2.BlazorServer\Web_Labb2.BlazorServer.csproj", "{D208FE83-7BFE-4BEB-83FC-458EE2417F22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{96732607-ECAA-493B-ACBC-CEA364615B76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96732607-ECAA-493B-ACBC-CEA364615B76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96732607-ECAA-493B-ACBC-CEA364615B76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D208FE83-7BFE-4BEB-83FC-458EE2417F22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D208FE83-7BFE-4BEB-83FC-458EE2417F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D208FE83-7BFE-4BEB-83FC-458EE2417F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D208FE83-7BFE-4BEB-83FC-458EE2417F22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
