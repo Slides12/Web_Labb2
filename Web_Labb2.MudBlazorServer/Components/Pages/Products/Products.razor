@@ -1,6 +1,6 @@
 ﻿@page "/products"
 @inject APIClient APIClient
-
+@inject AuthenticationStateProvider AuthProvider
 
 
 <PageTitle>Weather</PageTitle>
@@ -28,6 +28,11 @@ else
             <MudTd DataLabel="Price">@context.Price</MudTd>
             <MudTd DataLabel="ProductCategory">@context.ProductCategory</MudTd>
             <MudTd DataLabel="Description">@context.Description</MudTd>
+            @if (isAdmin)
+            {
+                <MudTd><MudButton>Edit</MudButton></MudTd>
+                <MudTd><MudButton>Delete</MudButton></MudTd>
+            }
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{50, 100}" />
@@ -38,11 +43,14 @@ else
 @code {
 
     private List<ProductDTO> products = new List<ProductDTO>();
-
+    private bool isAdmin;
     protected override async Task OnInitializedAsync()
     {
 
         products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        isAdmin = authState.User.IsInRole("Admin");
     }
 
   

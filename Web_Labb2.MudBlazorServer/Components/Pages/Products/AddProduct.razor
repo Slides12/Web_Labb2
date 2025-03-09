@@ -1,5 +1,6 @@
 ﻿@page "/add-product"
 @inject APIClient APIClient
+@attribute [Authorize(Roles = "Admin")]
 
 <EditForm Model="@product" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
