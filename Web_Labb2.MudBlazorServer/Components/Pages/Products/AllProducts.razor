@@ -1,0 +1,45 @@
+﻿@page "/all-products"
+@inject APIClient APIClient
+@inject AuthenticationStateProvider AuthProvider
+
+<MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" >
+    @foreach(var product in products)
+    {
+        <MudLink Margin="5">
+            <MudPaper Height="400px" Width="300px" Class="pa-4">
+                <MudGrid>
+                    <!-- First Row -->
+                    <MudItem xs="12" sm="12" md="12">
+                            <MudText Typo="Typo.h6">@product.ProductName</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="12">
+                            <MudImage Height="120" Src="@product.ImagePath"></MudImage>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="12">
+                        <MudText Typo="Typo.h6">@product.Price kr</MudText>
+                        <MudText Typo="Typo.body2">@product.Description</MudText>
+                    </MudItem>
+
+                    <!-- Second Row -->
+                    <MudItem xs="12" sm="12" md="6">
+                        <MudIconButton Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Default" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudLink>
+        
+    }
+</MudStack>
+
+@code {
+
+    private List<ProductDTO> products = new List<ProductDTO>();
+    protected override async Task OnInitializedAsync()
+    {
+
+        products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+
+       
+    }
+
+}

@@ -21,6 +21,7 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.Price)">Price</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.ProductCategory)">Product Category</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.Description!)">Description</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProductDTO, object>(x=>x.Status!)">Is Available</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ProductName">@context.ProductName</MudTd>
@@ -28,6 +29,7 @@ else
             <MudTd DataLabel="Price">@context.Price</MudTd>
             <MudTd DataLabel="ProductCategory">@context.ProductCategory</MudTd>
             <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="Available">@context.Status</MudTd>
             @if (isAdmin)
             {
                 <MudTd><MudButton>Edit</MudButton></MudTd>

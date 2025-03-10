@@ -24,7 +24,8 @@ namespace Web_Labb2.Services
                 ProductCategory = p.ProductCategory,
                 Description = p.Description,
                 Price = p.Price,
-                Status = p.Status
+                Status = p.Status,
+                ImagePath = p.ImagePath
             });
         }
 
@@ -42,7 +43,8 @@ namespace Web_Labb2.Services
                         ProductCategory = product.ProductCategory,
                         Description = product.Description,
                         Price = product.Price,
-                        Status = product.Status
+                        Status = product.Status,
+                        ImagePath = product.ImagePath
                     };
                 }
                 return null;
@@ -67,7 +69,8 @@ namespace Web_Labb2.Services
                         ProductCategory = product.ProductCategory,
                         Description = product.Description,
                         Price = product.Price,
-                        Status = product.Status
+                        Status = product.Status,
+                        ImagePath = product.ImagePath
                     };
                 }
                 return null;
@@ -91,7 +94,8 @@ namespace Web_Labb2.Services
                 ProductCategory = newProduct.ProductCategory,
                 Description = newProduct.Description,
                 Price = newProduct.Price,
-                Status = newProduct.Status
+                Status = newProduct.Status,
+                ImagePath = newProduct.ImagePath
             });
 
             await _unitOfWork.SaveChangesAsync();
@@ -108,6 +112,7 @@ namespace Web_Labb2.Services
             existingProduct.ProductName = string.IsNullOrEmpty(updatedProduct.ProductName) ? existingProduct.ProductName : updatedProduct.ProductName;
             existingProduct.Description = string.IsNullOrEmpty(updatedProduct.Description) ? existingProduct.Description : updatedProduct.Description;
             existingProduct.ProductCategory = string.IsNullOrEmpty(updatedProduct.ProductCategory) ? existingProduct.ProductCategory : updatedProduct.ProductCategory;
+            existingProduct.ImagePath = string.IsNullOrEmpty(updatedProduct.ImagePath) ? existingProduct.ImagePath : updatedProduct.ImagePath;
 
             if (updatedProduct.Price > 1)
             {

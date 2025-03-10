@@ -11,5 +11,7 @@ namespace Web_Labb2.DTO_s
         public decimal Price { get; set; }
         public required string ProductCategory { get; set; }
         public bool Status { get; set; }
+        public string? ImagePath { get; set; } = string.Empty;
+
     }
 }

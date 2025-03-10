@@ -12,4 +12,6 @@ public class ProductEntity
     public required string ProductCategory { get; set; }
     public bool Status { get; set; }
     public List<OrderDetail> OrderDetails { get; set; }
+
+    public string? ImagePath { get; set; } = string.Empty;
 }

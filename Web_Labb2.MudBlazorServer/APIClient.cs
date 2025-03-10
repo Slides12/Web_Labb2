@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,6 +46,38 @@ namespace Web_Labb2.BlazorServer
             var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T1>(responseJson);
         }
+
+        public async Task<string> PostFileAsync(string path, IBrowserFile file)
+        {
+            using var content = new MultipartFormDataContent();
+            using var fileStream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+            using var streamContent = new StreamContent(fileStream);
+
+            content.Add(streamContent, "file", file.Name);
+
+            var response = await httpClient.PostAsync(path, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Error uploading file: {response.StatusCode}");
+                return string.Empty;
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"PostFileAsync Response: {responseJson}");
+
+            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
+
+            if (result != null && result.TryGetValue("imagePath", out string? imagePath))
+            {
+                Console.WriteLine($"Parsed Image Path: {imagePath}");
+                return imagePath;
+            }
+
+            Console.WriteLine("Failed to parse image path from response.");
+            return string.Empty;
+        }
+
+
 
 
         public async Task<T1> PutAsync<T1,T2>(string path, T2 postModel)

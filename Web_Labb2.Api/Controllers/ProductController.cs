@@ -51,7 +51,6 @@ namespace Web_Labb2.Controllers
         }
 
         // POST api/<ProductController>
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> PostProduct([FromBody] ProductDTO newProduct)
         {
@@ -69,6 +68,27 @@ namespace Web_Labb2.Controllers
 
             return BadRequest("Invalid product data");
         }
+
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var imageUrl = $"https://localhost:7218/uploads/{fileName}"; // Return full URL
+
+            return Ok(new { imagePath = imageUrl });
+        }
+
+
 
 
         // PUT api/<ProductController>/5
