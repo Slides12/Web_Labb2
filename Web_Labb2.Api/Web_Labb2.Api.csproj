@@ -24,8 +24,4 @@
     <ProjectReference Include="..\Web_Labb2.Shared\Web_Labb2.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\uploads\" />
-  </ItemGroup>
-
 </Project>
