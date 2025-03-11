@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Web_Labb2.Api.Services;
 using Web_Labb2.DTO_s;
 using Web_Labb2.Services;
@@ -92,10 +93,12 @@ namespace Web_Labb2.Controllers
 
 
         // PUT api/<ProductController>/5
-        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> PutAllInfo(string id, [FromBody] ProductDTO updatedProduct)
         {
+            Console.WriteLine($"Received PUT request for product ID: {id}");
+            Console.WriteLine($"Request body: {JsonConvert.SerializeObject(updatedProduct)}");
+
             if (string.IsNullOrEmpty(id)) return BadRequest("You need to enter a Product Id.");
             if (updatedProduct == null) return BadRequest("You need to add data to be updated.");
 
@@ -105,6 +108,7 @@ namespace Web_Labb2.Controllers
 
             return Ok("Product was updated successfully.");
         }
+
 
         // PUT api/<ProductController>/5
         [Authorize(Roles = "Admin")]

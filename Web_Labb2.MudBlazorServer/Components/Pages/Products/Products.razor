@@ -2,6 +2,7 @@
 @inject APIClient APIClient
 @inject AuthenticationStateProvider AuthProvider
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 
 
@@ -36,7 +37,7 @@ else
             @if (isAdmin)
             {
                 <MudTd><MudButton OnClick="() => SetStatus(context.ProductId)">Status</MudButton></MudTd>
-                <MudTd><MudButton>Edit</MudButton></MudTd>
+                <MudTd><MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@((e) => UpdateProduct(context))">Update</MudButton></MudTd>
                 <MudTd><MudButton @onclick="() => DeleteProduct(context.ProductId)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton></MudTd>
             }
         </RowTemplate>
@@ -72,7 +73,7 @@ else
     }
 
 
-     public async Task DeleteProduct(string id)
+    public async Task DeleteProduct(string id)
     {
         var parameters = new DialogParameters
         {
@@ -106,6 +107,18 @@ else
     }
 
 
+  public async Task UpdateProduct(ProductDTO updatedProduct)
+{
+    var parameters = new DialogParameters
+    {
+        { "ProductId", updatedProduct.ProductId }
+    };
+
+    var dialog = await DialogService.ShowAsync<UpdateDialog>("Update Product", parameters);
+    var result = await dialog.Result;
+
+    
+}
 
 
 

@@ -1,0 +1,58 @@
+﻿@inject ISnackbar Snackbar
+@inject APIClient APIClient
+@inject AuthenticationStateProvider AuthProvider
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Update Product
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Value="@product.ProductName" Label="Product Name" ReadOnly="false" />
+        <MudTextField Value="@product.ProductCategory" Label="Product Category" ReadOnly="false" />
+        <MudTextField Value="@ProductId" Label="Product Id" ReadOnly="true" />
+        <MudTextField Value="@product.Price" Label="Price" ReadOnly="false" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="UpdateProduct">Update Product</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    // Accepting the ProductId as a parameter
+    [Parameter] public string ProductId { get; set; }
+
+    [Parameter]
+    public ProductDTO product { get; set; } = new ProductDTO()
+        {
+            ProductCategory = "",
+            ProductId = "",
+            ProductName = ""
+        };
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task UpdateProduct()
+    {
+        try
+        {
+            await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/{product.ProductId}", product);
+
+            Snackbar.Add("Product Updated", Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(product.ProductId));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+}
+
