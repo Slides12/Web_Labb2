@@ -12,5 +12,7 @@ namespace Web_Labb2.Shared.Models
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string? Role { get; set; }
+        public string Email { get; set; } = "";
+
     }
 }

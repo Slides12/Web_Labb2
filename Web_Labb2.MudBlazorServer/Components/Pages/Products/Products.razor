@@ -3,7 +3,7 @@
 @inject AuthenticationStateProvider AuthProvider
 
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Products</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">All our products</MudText>
 <MudText Typo="Typo.body1" Class="mb-8">Show all our current products.</MudText>
@@ -32,8 +32,9 @@ else
             <MudTd DataLabel="Available">@context.Status</MudTd>
             @if (isAdmin)
             {
+                <MudTd><MudButton OnClick="() => SetStatus(context.ProductId)">Status</MudButton></MudTd>
                 <MudTd><MudButton>Edit</MudButton></MudTd>
-                <MudTd><MudButton>Delete</MudButton></MudTd>
+                <MudTd><MudButton OnClick="() => DeleteProduct(context.ProductId)">Delete</MudButton></MudTd>
             }
         </RowTemplate>
         <PagerContent>
@@ -54,6 +55,43 @@ else
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         isAdmin = authState.User.IsInRole("Admin");
     }
+
+    public async Task SetStatus(string id)
+    {
+        var productToUpdate = products.FirstOrDefault(p => p.ProductId == id);
+        if (productToUpdate != null)
+        {
+            productToUpdate.Status = !productToUpdate.Status; // Assuming Status is a boolean (toggle availability)
+
+            await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/status/{id}", productToUpdate);
+            StateHasChanged();
+        }
+    }
+
+
+    public async Task<bool> DeleteProduct(string id)
+    {
+        try
+        {
+            bool result = await APIClient.DeleteAsync($"https://localhost:7218/api/Product/{id}");
+        
+            if (result)
+            {
+                products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+                StateHasChanged();
+            }
+        
+            return result;
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error deleting product: {ex.Message}");
+            return false;
+        }
+    }
+
+
+
 
   
 }

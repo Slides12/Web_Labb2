@@ -33,19 +33,48 @@ namespace Web_Labb2.BlazorServer
 
         public async Task<T1> PostAsync<T1, T2>(string path, T2 postModel)
         {
-            var json = JsonConvert.SerializeObject(postModel);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            await SetAuthorizedHeader();
 
-            var response = await httpClient.PostAsync(path, content);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new Exception($"Error: {response.StatusCode}");
-            }
+                // Serialize request model to JSON
+                var json = JsonConvert.SerializeObject(postModel);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T1>(responseJson);
+                // Send HTTP POST request
+                var response = await httpClient.PostAsync(path, content);
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                // Log response details (for debugging)
+                Console.WriteLine($"Response Status: {response.StatusCode}");
+                Console.WriteLine($"Response Content-Type: {response.Content.Headers.ContentType}");
+                Console.WriteLine($"Response JSON: {responseJson}");
+
+                // Throw exception if the response is not successful
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error: {response.StatusCode}, Response: {responseJson}");
+                }
+
+                // Handle empty response
+                if (string.IsNullOrWhiteSpace(responseJson))
+                {
+                    return default(T1);
+                }
+
+                // Deserialize JSON response
+                return JsonConvert.DeserializeObject<T1>(responseJson);
+            }
+            catch (JsonException ex)
+            {
+                throw new Exception($"JSON Parsing Error: {ex.Message}. Response: {path}");
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"HTTP Request Error: {ex.Message}");
+            }
         }
+
 
         public async Task<string> PostFileAsync(string path, IBrowserFile file)
         {
@@ -80,22 +109,52 @@ namespace Web_Labb2.BlazorServer
 
 
 
-        public async Task<T1> PutAsync<T1,T2>(string path, T2 postModel)
+        public async Task<T1> PutAsync<T1, T2>(string path, T2 postModel)
         {
             await SetAuthorizedHeader();
-            var res = await httpClient.PutAsJsonAsync(path, postModel);
-            if (res != null && res.IsSuccessStatusCode)
+
+            var response = await httpClient.PutAsJsonAsync(path, postModel);
+
+            if (!response.IsSuccessStatusCode)
             {
-                var content = JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
-                return content;
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error response from API: {response.StatusCode} - {errorContent}");
+                throw new Exception($"API Error: {response.StatusCode} - {errorContent}");
             }
-            return default;
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response from API: {responseJson}");
+
+            if (!responseJson.StartsWith("{") && !responseJson.StartsWith("["))
+            {
+                Console.WriteLine("Received plain text response: " + responseJson);
+                return default(T1);
+            }
+
+            try
+            {
+                return JsonConvert.DeserializeObject<T1>(responseJson);
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Failed to deserialize response. Raw response: {responseJson}");
+                throw new Exception("JSON deserialization error", ex);
+            }
         }
 
-        public async Task<T> DeleteAsync<T>(string path)
+
+
+        public async Task<bool> DeleteAsync(string path)
         {
             await SetAuthorizedHeader();
-            return await  httpClient.DeleteFromJsonAsync<T>(path);
+            var response = await httpClient.DeleteAsync(path);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
         }
+
     }
 }

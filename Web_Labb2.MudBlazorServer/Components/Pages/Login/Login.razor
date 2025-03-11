@@ -4,6 +4,8 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 
+<MudText Typo="Typo.h1">Login</MudText>
+
 <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
     <MudGrid>
@@ -11,9 +13,9 @@
             <MudCard>
                 <MudCardContent>
                     <MudTextField Label="First name" HelperText="Max. 8 characters"
-                                  @bind-Value="loginModel.Username" For="@(() => loginModel.Username)" />
-                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                                  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password" />
+                    @bind-Value="loginModel.Username" For="@(() => loginModel.Username)" />
+                    <MudTextField Label="Password" HelperText="Your password" Class="mt-3"
+                    @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password" />
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
@@ -34,10 +36,14 @@
                 }
             </MudText>
         </MudItem>
+        
     </MudGrid>
 </EditForm>
+
+<MudButton OnClick="Register" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto">Register</MudButton>
+
 @code {
-    private LoginDTO loginModel = new LoginDTO();
+    private LoginDTO loginModel = new LoginDTO() { Username="", Password=""};
     bool success;
 
     private async Task HandleLogin()
@@ -47,7 +53,12 @@
         {
             success = true;
             ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
-            Navigation.NavigateTo("/admin");
+            Navigation.NavigateTo("/dashboard");
         }
+    }
+
+    private async Task Register()
+    {
+        Navigation.NavigateTo("/register");
     }
 }

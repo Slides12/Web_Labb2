@@ -1,0 +1,59 @@
+﻿@page "/register"
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject APIClient APIClient
+
+<MudText Typo="Typo.h1">Register</MudText>
+
+
+<EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="DragonSlayer88" HelperText="Your username"
+                    @bind-Value="registerModel.Username" For="@(() => registerModel.Username)" />
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                    @bind-Value="registerModel.Password" For="@(() => registerModel.Password)" InputType="InputType.Password" />
+                    <MudTextField Label="Password" HelperText="Confirm password" Class="mt-3"
+                    @bind-Value="registerModel.ConfirmPassword" For="@(() => registerModel.ConfirmPassword)" InputType="InputType.Password" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@code {
+    private UserDTO registerModel = new() { Username = "", Password = ""};
+    bool success = false;
+    public async Task HandleRegister()
+    {
+        var res = await APIClient.PostAsync<User, UserDTO>("https://localhost:7218/api/Auth/register", registerModel);
+
+        if (res != null)
+        {
+            success = true;
+            Navigation.NavigateTo("/login");
+        }
+
+    }
+}

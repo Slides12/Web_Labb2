@@ -129,12 +129,15 @@ namespace Web_Labb2.Controllers
             {
                 return BadRequest("You need to input a correct product Id.");
             }
+
             var result = await _productService.DeleteProductById(id);
             if (!result)
             {
                 return NotFound("No product with that Id exists.");
             }
-            return Ok($"Deleted product with Id: {id}");
+
+            return NoContent();
         }
+
     }
 }

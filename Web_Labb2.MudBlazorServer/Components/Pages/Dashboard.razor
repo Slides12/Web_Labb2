@@ -1,0 +1,25 @@
+﻿@page "/dashboard"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div>You are authorized!</div>
+    </Authorized>
+</AuthorizeView>
+
+<h3>@userRole</h3>
+
+@code {
+    private string userRole = "Unknown";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No Role Assigned";
+        }
+    }
+}

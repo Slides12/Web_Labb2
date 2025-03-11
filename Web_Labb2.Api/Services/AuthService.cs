@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Web_Labb2.Data;
+using Web_Labb2.DTO_s;
 using Web_Labb2.Shared.DTO_s;
 using Web_Labb2.Shared.Models;
 
@@ -94,6 +95,19 @@ namespace Web_Labb2.Api.Services
             await _unitOfWork.SaveChangesAsync();
 
             return user;
+        }
+
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        {
+            var customers = await _unitOfWork.Users.GetAllAsync();
+
+            return customers.Select(u => new UserDTO
+            {
+               Username = u.Username,
+               Role = u.Role,
+               Email = u.Email,
+               Password = u.PasswordHash
+            });
         }
     }
 }

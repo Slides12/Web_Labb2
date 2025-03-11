@@ -1,0 +1,70 @@
+﻿@page "/users"
+@inject APIClient APIClient
+@inject AuthenticationStateProvider AuthProvider
+
+
+<PageTitle>Users</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">-Admin-</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Handle users.</MudText>
+
+@if (users == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<UserDTO, object>(x=>x.Username)">Username</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserDTO, object>(x=>x.Role)">Role</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserDTO, object>(x=>x.Password)">Password</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserDTO, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Username">@context.Username</MudTd>
+            <MudTd DataLabel="Role">@context.Role</MudTd>
+            <MudTd DataLabel="Password">@context.Password</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            @if (isAdmin)
+            {
+                <MudTd><MudButton >Status</MudButton></MudTd>
+                <MudTd><MudButton>Edit</MudButton></MudTd>
+                <MudTd><MudButton>Delete</MudButton></MudTd>
+            }
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    private List<UserDTO> users = new List<UserDTO>();
+    private bool isAdmin;
+    protected override async Task OnInitializedAsync()
+    {
+
+        users = await APIClient.GetFromJsonAsync<List<UserDTO>>("https://localhost:7218/api/Auth");
+
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        isAdmin = authState.User.IsInRole("Admin");
+        StateHasChanged();
+    }
+
+    // public async Task SetStatus(string id)
+    // {
+    //     var productToUpdate = users.FirstOrDefault(p => p.ProductId == id);
+    //     if (productToUpdate != null)
+    //     {
+    //         productToUpdate.Status = !productToUpdate.Status; // Assuming Status is a boolean (toggle availability)
+
+    //         await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/status/{id}", productToUpdate);
+    //         StateHasChanged();
+    //     }
+    // }
+
+
+
+}

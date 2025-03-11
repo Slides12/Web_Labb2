@@ -9,5 +9,7 @@ namespace Web_Labb2.Api.Services
         public string GenerateJwtToken(string username, string role);
         public Task<AuthResult> ValidateUser(LoginDTO request);
         public Task<User?> RegisterAsync(UserDTO request);
+        public Task<IEnumerable<UserDTO>> GetAllUsers();
+
     }
 }

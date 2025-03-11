@@ -5,29 +5,29 @@
 <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" >
     @foreach(var product in products)
     {
-        <MudLink Margin="5">
-            <MudPaper Height="400px" Width="300px" Class="pa-4">
-                <MudGrid>
-                    <!-- First Row -->
-                    <MudItem xs="12" sm="12" md="12">
-                            <MudText Typo="Typo.h6">@product.ProductName</MudText>
-                    </MudItem>
-                    <MudItem xs="12" sm="12" md="12">
-                        <MudImage Src="@product.ImagePath" ObjectFit="ObjectFit.Contain"></MudImage>
-                    </MudItem>
-                    <MudItem xs="12" sm="12" md="12">
-                        <MudText Typo="Typo.h6">@product.Price kr</MudText>
-                        <MudText Typo="Typo.body2">@product.Description</MudText>
-                    </MudItem>
+        if(product.Status == true)
+        {
+            <MudLink Margin="5">
+                <MudPaper Height="400px" Width="300px" Class="pa-4">
+                    <MudGrid>
+                        <MudItem xs="12" sm="12" md="12">
+                                <MudText Typo="Typo.h6">@product.ProductName</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="12">
+                            <MudImage Src="@product.ImagePath" Width="270" Height="150" ></MudImage>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="12">
+                            <MudText Typo="Typo.h6">@product.Price kr</MudText>
+                            <MudText Typo="Typo.body2">@product.Description</MudText>
+                        </MudItem>
 
-                    <!-- Second Row -->
-                    <MudItem xs="12" sm="12" md="6">
-                        <MudIconButton Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Default" />
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudLink>
-        
+                        <MudItem xs="12" sm="12" md="6">
+                            <MudIconButton Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Default" />
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudLink>
+        }
     }
 </MudStack>
 

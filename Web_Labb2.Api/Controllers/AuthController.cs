@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Web_Labb2.Api.Services;
+using Web_Labb2.DTO_s;
+using Web_Labb2.Services;
 using Web_Labb2.Shared.DTO_s;
 using Web_Labb2.Shared.Models;
 
@@ -15,6 +18,15 @@ namespace Web_Labb2.Api.Controllers
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+        }
+
+        // GET: api/<CustomerController>
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CustomerDTO>>> GetAllUsers()
+        {
+            var users = await _authService.GetAllUsers();
+            return Ok(users);
         }
 
 
