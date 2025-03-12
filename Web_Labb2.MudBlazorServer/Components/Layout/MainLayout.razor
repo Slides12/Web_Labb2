@@ -7,7 +7,11 @@
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Dinet</MudText>
+        <MudLink Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Class="mr-1" />
+            Dinet
+        </MudLink>
+
         <MudSpacer />
         <AuthorizeView>
             <Authorized>

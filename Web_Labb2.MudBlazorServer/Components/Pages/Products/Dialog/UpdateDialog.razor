@@ -5,19 +5,19 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
             Update Product
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Value="@product.ProductName" Label="Product Name" ReadOnly="false" />
-        <MudTextField Value="@product.ProductCategory" Label="Product Category" ReadOnly="false" />
-        <MudTextField Value="@ProductId" Label="Product Id" ReadOnly="true" />
-        <MudTextField Value="@product.Price" Label="Price" ReadOnly="false" />
+        <MudTextField @bind-Value="@product.ProductName" Label="Product Name" ReadOnly="false" />
+        <MudTextField @bind-Value="@product.ProductCategory" Label="Product Category" ReadOnly="false" />
+        <MudTextField @bind-Value="@product.Price" Label="Price" ReadOnly="false" />
+        <MudTextField @bind-Value="@product.Description" Label="Description" ReadOnly="false" Lines="3" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="UpdateProduct">Update Product</MudButton>
+        <MudButton Color="Color.Primary" OnClick="UpdateProduct">Update Product</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -42,10 +42,14 @@
     {
         try
         {
-            await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/{product.ProductId}", product);
+            Console.WriteLine($"Updating Product with ID: {product.ProductId}");
+
+            await APIClient.PutAsync<string, ProductDTO>(
+                $"https://localhost:7218/api/Product/update/{product.ProductId}",
+                product
+            );
 
             Snackbar.Add("Product Updated", Severity.Success);
-
             MudDialog.Close(DialogResult.Ok(product.ProductId));
         }
         catch (Exception ex)
@@ -53,6 +57,8 @@
             Snackbar.Add($"Error: {ex.Message}", Severity.Error);
         }
     }
+
+
 
 }
 

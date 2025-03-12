@@ -63,7 +63,6 @@ namespace Web_Labb2.Controllers
                     return BadRequest("The product was null.");
                 }
 
-                // Ensure the response content is correctly serialized to JSON
                 return CreatedAtAction(nameof(PostProduct), new { id = newProduct.ProductId }, newProduct);
             }
 
@@ -93,11 +92,10 @@ namespace Web_Labb2.Controllers
 
 
         // PUT api/<ProductController>/5
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<ActionResult> PutAllInfo(string id, [FromBody] ProductDTO updatedProduct)
         {
-            Console.WriteLine($"Received PUT request for product ID: {id}");
-            Console.WriteLine($"Request body: {JsonConvert.SerializeObject(updatedProduct)}");
+            Console.WriteLine($"Received PUT request for product ID: {updatedProduct.ProductId}");
 
             if (string.IsNullOrEmpty(id)) return BadRequest("You need to enter a Product Id.");
             if (updatedProduct == null) return BadRequest("You need to add data to be updated.");

@@ -37,42 +37,31 @@ namespace Web_Labb2.BlazorServer
 
             try
             {
-                // Serialize request model to JSON
+
                 var json = JsonConvert.SerializeObject(postModel);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Send HTTP POST request
                 var response = await httpClient.PostAsync(path, content);
                 var responseJson = await response.Content.ReadAsStringAsync();
 
-                // Log response details (for debugging)
-                Console.WriteLine($"Response Status: {response.StatusCode}");
-                Console.WriteLine($"Response Content-Type: {response.Content.Headers.ContentType}");
-                Console.WriteLine($"Response JSON: {responseJson}");
 
-                // Throw exception if the response is not successful
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception($"Error: {response.StatusCode}, Response: {responseJson}");
                 }
 
-                // Handle empty response
                 if (string.IsNullOrWhiteSpace(responseJson))
                 {
                     return default(T1);
                 }
 
-                // Deserialize JSON response
                 return JsonConvert.DeserializeObject<T1>(responseJson);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                throw new Exception($"JSON Parsing Error: {ex.Message}. Response: {path}");
+                throw new Exception($"Error: {ex.Message}. Response: {path}");
             }
-            catch (HttpRequestException ex)
-            {
-                throw new Exception($"HTTP Request Error: {ex.Message}");
-            }
+            
         }
 
 
@@ -87,12 +76,12 @@ namespace Web_Labb2.BlazorServer
             var response = await httpClient.PostAsync(path, content);
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Error uploading file: {response.StatusCode}");
+                Console.WriteLine($"Error saving file: {response.StatusCode}");
                 return string.Empty;
             }
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"PostFileAsync Response: {responseJson}");
+            Console.WriteLine($"Response: {responseJson}");
 
             var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
 
@@ -102,7 +91,7 @@ namespace Web_Labb2.BlazorServer
                 return imagePath;
             }
 
-            Console.WriteLine("Failed to parse image path from response.");
+            Console.WriteLine("Couldnt parse imagepath.");
             return string.Empty;
         }
 
@@ -118,29 +107,30 @@ namespace Web_Labb2.BlazorServer
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Error response from API: {response.StatusCode} - {errorContent}");
+                Console.WriteLine($"Error from API: {response.StatusCode} - {errorContent}");
                 throw new Exception($"API Error: {response.StatusCode} - {errorContent}");
             }
 
             var responseJson = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Response from API: {responseJson}");
 
-            if (!responseJson.StartsWith("{") && !responseJson.StartsWith("["))
-            {
-                Console.WriteLine("Received plain text response: " + responseJson);
-                return default(T1);
-            }
-
             try
             {
+                if (typeof(T1) == typeof(string))
+                {
+                    return default(T1);
+                }
+
                 return JsonConvert.DeserializeObject<T1>(responseJson);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Failed to deserialize response. Raw response: {responseJson}");
-                throw new Exception("JSON deserialization error", ex);
+                Console.WriteLine($"Failed to deserialize response. Response: {responseJson}");
+                throw new Exception("Error", ex);
             }
         }
+
+        
 
 
 
