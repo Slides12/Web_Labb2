@@ -21,6 +21,8 @@ namespace Web_Labb2.Shared.DTO_s
         public string ConfirmPassword { get; set; }
 
         public string Role { get; set; } = "User";
+        [Required]
+        [StringLength(30, ErrorMessage = "Email is required.", MinimumLength = 8)]
         public string Email { get; set; } = "";
     }
 

@@ -18,6 +18,8 @@
                     @bind-Value="registerModel.Password" For="@(() => registerModel.Password)" InputType="InputType.Password" />
                     <MudTextField Label="Password" HelperText="Confirm password" Class="mt-3"
                     @bind-Value="registerModel.ConfirmPassword" For="@(() => registerModel.ConfirmPassword)" InputType="InputType.Password" />
+                    <MudTextField Label="Email" HelperText="yourname@email.com" Class="mt-3"
+                                  @bind-Value="registerModel.Email" For="@(() => registerModel.Email)" />
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
