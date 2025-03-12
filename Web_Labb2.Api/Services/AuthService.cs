@@ -109,5 +109,56 @@ namespace Web_Labb2.Api.Services
                Password = u.PasswordHash
             });
         }
+
+        public async Task<bool> DeleteUsertByUsernam(string usernam)
+        {
+            var user = await _unitOfWork.Users.GetUserByUsernameAsync(usernam);
+            if (user is null)
+            {
+                return false;
+            }
+            _unitOfWork.Users.DeleteUser(user);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateUserAsync(string username, UserDTO updatedUser)
+        {
+            if (updatedUser == null) return false;
+            var existingUser = await _unitOfWork.Users.GetUserByUsernameAsync(username);
+            if (existingUser == null) return false;
+
+            existingUser.Username = string.IsNullOrEmpty(updatedUser.Username) ? updatedUser.Username : updatedUser.Username;
+            existingUser.Role = string.IsNullOrEmpty(updatedUser.Role) ? updatedUser.Role : updatedUser.Role;
+            existingUser.Email = string.IsNullOrEmpty(updatedUser.Email) ? updatedUser.Email : updatedUser.Email;
+
+
+            _unitOfWork.Users.UpdateUser(existingUser);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<UserDTO> GetUserByUsername(string username)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.GetUserByUsernameAsync(username);
+                if (user != null)
+                {
+                    return new UserDTO()
+                    {
+                        Username = user.Username,
+                        Role = user.Role,
+                        Email = user.Email,
+                        Password = user.PasswordHash,
+                    };
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred while retrieving the product.", ex);
+            }
+        }
     }
 }

@@ -56,5 +56,52 @@ namespace Web_Labb2.Api.Controllers
         }
 
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("get-user/{username}")]
+        public async Task<ActionResult<ProductDTO>> GetProductByName(string username)
+        {
+            var result = await _authService.GetUserByUsername(username);
+            if (result == null)
+            {
+                return NotFound("There is no user by this name.");
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update/{username}")]
+        public async Task<ActionResult> PutAllInfo(string username, [FromBody] UserDTO updatedUser)
+        {
+            Console.WriteLine($"Received PUT request for product ID: {updatedUser.Username}");
+
+            if (string.IsNullOrEmpty(username)) return BadRequest("You need to enter a username.");
+            if (updatedUser == null) return BadRequest("You need to add data to be updated.");
+
+            var result = await _authService.UpdateUserAsync(username, updatedUser);
+            if (!result)
+                return NotFound("Did not find a user by that name.");
+
+            return Ok("User was updated successfully.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{username}")]
+        public async Task<ActionResult> DeleteProduct(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return BadRequest("You need to input a correct username.");
+            }
+
+            var result = await _authService.DeleteUsertByUsernam(username);
+            if (!result)
+            {
+                return NotFound("No user with that Name exists.");
+            }
+
+            return NoContent();
+        }
+
+
     }
 }
