@@ -6,7 +6,7 @@
 <PageTitle>Users</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">-Admin-</MudText>
-<MudText Typo="Typo.body1" Class="mb-8">Handle users.</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Edit users.</MudText>
 
 @if (users == null)
 {
@@ -55,15 +55,67 @@ else
 
     // public async Task SetStatus(string id)
     // {
-    //     var productToUpdate = users.FirstOrDefault(p => p.ProductId == id);
+    //     var productToUpdate = products.FirstOrDefault(p => p.ProductId == id);
     //     if (productToUpdate != null)
     //     {
     //         productToUpdate.Status = !productToUpdate.Status; // Assuming Status is a boolean (toggle availability)
 
     //         await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/status/{id}", productToUpdate);
+
+    //         Snackbar.Add($"Status on product: {productToUpdate.ProductName} is now : {productToUpdate.Status}", Severity.Success);
+
     //         StateHasChanged();
     //     }
     // }
+
+
+    public async Task DeleteUser(string id)
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to delete this product? This action cannot be undone." },
+            { "ButtonText", "Delete" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDeleteDialog>("Confirm Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            try
+            {
+                bool deleteSuccess = await APIClient.DeleteAsync($"https://localhost:7218/api/Product/{id}");
+
+                if (deleteSuccess)
+                {
+                    products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+                    StateHasChanged();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Snackbar.Add($"Error deleting product: {ex.Message}", Severity.Success);
+            }
+        }
+    }
+
+
+    public async Task UpdateProduct(ProductDTO updatedProduct)
+    {
+        var parameters = new DialogParameters
+    {
+        { "product", updatedProduct }
+    };
+
+
+        var dialog = await DialogService.ShowAsync<UpdateDialog>("Update Product", parameters);
+        var result = await dialog.Result;
+
+
+    }
 
 
 
