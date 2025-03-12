@@ -90,6 +90,8 @@ namespace Web_Labb2.Api.Services
             user.Username = request.Username;
             user.PasswordHash = hashedPassword;
             user.Role = request.Role;
+            user.Email = request.Email;
+
 
             await _unitOfWork.Users.AddUserAsync(user);
             await _unitOfWork.SaveChangesAsync();

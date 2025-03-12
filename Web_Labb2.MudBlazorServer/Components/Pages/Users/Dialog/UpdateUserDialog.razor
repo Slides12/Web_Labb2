@@ -1,0 +1,58 @@
+﻿@inject ISnackbar Snackbar
+@inject APIClient APIClient
+@inject AuthenticationStateProvider AuthProvider
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update User
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="@user.Username" Label="Username" ReadOnly="false" />
+        <MudTextField @bind-Value="@user.Role" Label="Role" ReadOnly="false" />
+        <MudTextField @bind-Value="@user.Email" Label="Email" ReadOnly="false" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="UpdateUser">Update Product</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string Username { get; set; }
+
+    [Parameter]
+    public UpdateUserDTO user { get; set; } = new UpdateUserDTO() { Username = "" };
+
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task UpdateUser()
+    {
+        try
+        {
+            Console.WriteLine($"Updating User with username: {user.Username}");
+
+            await APIClient.PutAsync<string, UpdateUserDTO>(
+                $"https://localhost:7218/api/Auth/update/{user.Username}",
+                user
+            );
+
+            Snackbar.Add("User Updated", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(user.Username));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+
+
+}
+

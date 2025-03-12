@@ -70,14 +70,21 @@ namespace Web_Labb2.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update/{username}")]
-        public async Task<ActionResult> PutAllInfo(string username, [FromBody] UserDTO updatedUser)
+        public async Task<ActionResult> PutAllInfo(string username, [FromBody] UpdateUserDTO updatedUser)
         {
             Console.WriteLine($"Received PUT request for product ID: {updatedUser.Username}");
 
             if (string.IsNullOrEmpty(username)) return BadRequest("You need to enter a username.");
             if (updatedUser == null) return BadRequest("You need to add data to be updated.");
 
-            var result = await _authService.UpdateUserAsync(username, updatedUser);
+            var updateUserDTO = new UserDTO
+            {
+                Username = updatedUser.Username,
+                Role = updatedUser.Role,
+                Email = updatedUser.Email,
+            };
+
+            var result = await _authService.UpdateUserAsync(username, updateUserDTO);
             if (!result)
                 return NotFound("Did not find a user by that name.");
 
