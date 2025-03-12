@@ -68,6 +68,9 @@ else
             productToUpdate.Status = !productToUpdate.Status; // Assuming Status is a boolean (toggle availability)
 
             await APIClient.PutAsync<string, ProductDTO>($"https://localhost:7218/api/Product/status/{id}", productToUpdate);
+            
+            Snackbar.Add($"Status on product: {productToUpdate.ProductName} is now : {productToUpdate.Status}", Severity.Success);
+
             StateHasChanged();
         }
     }
@@ -101,7 +104,7 @@ else
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"Error deleting product: {ex.Message}");
+                Snackbar.Add($"Error deleting product: {ex.Message}", Severity.Success);
             }
         }
     }

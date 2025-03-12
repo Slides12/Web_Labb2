@@ -1,55 +1,67 @@
 ﻿@page "/add-product"
 @inject APIClient APIClient
+@inject ISnackbar Snackbar
 @attribute [Authorize(Roles = "Admin")]
 
-<EditForm Model="@product" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudGrid>
-        <MudItem xs="12" sm="7">
-            <MudCard>
-                <MudCardContent>
-                    <MudTextField Label="Product Name" HelperText="Asus rog gaming PC."
-                    @bind-Value="product.ProductName" For="@(() => product.ProductName)" />
-                    <MudTextField Label="Price" Class="mt-3"
-                    @bind-Value="product.Price" For="@(() => product.Price)" />
-                    <MudTextField Label="Product Category" HelperText="Component" Class="mt-3"
-                    @bind-Value="product.ProductCategory" For="@(() => product.ProductCategory)" />
-                    <MudTextField Label="Product Id" HelperText="123898329" Class="mt-3"
-                    @bind-Value="product.ProductId" For="@(() => product.ProductId)" />
-                    <MudTextField Label="Description" Lines="3" HelperText="This PC is the ultimate gaming pc." Class="mt-3"
-                                  @bind-Value="product.Description" For="@(() => product.Description)" />
-                </MudCardContent>
-                <MudCardActions>
-                    <MudFileUpload T="IBrowserFile" Accept=".png, .jpg" FilesChanged="UploadFiles2" MaximumFileCount="100">
-                        <ActivatorContent>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.CloudUpload">
-                                Add product image
-                            </MudButton>
-                        </ActivatorContent>
-                    </MudFileUpload>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-        
-        <MudItem xs="12">
-            <MudText Typo="Typo.body2" Align="Align.Center">
-                @if (success)
-                {
-                    <MudText Color="Color.Success">Success</MudText>
-                }
-                else
-                {
-                    <MudText Color="@Color.Error">
-                        <ValidationSummary />
-                    </MudText>
-                }
-            </MudText>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+<MudStack Spacing="20" Class="w-100 d-flex justify-center align-center mt-5">
+    <MudPaper Elevation="3">
+        <MudText Typo="Typo.h5" Align="Align.Center" >Add a product below, you can also add a image for this product. After creation it will not be visible until you set "Status" to true in "Edit products"</MudText>
+    </MudPaper>
+
+    <EditForm Model="@product" OnValidSubmit="OnValidSubmit" Class="text-center w-100">
+        <DataAnnotationsValidator />
+        <MudGrid Class="w-100">
+            <MudItem Class="d-flex justify-center">
+                <MudCard Class="w-100">
+                    <MudCardContent>
+                        <MudTextField Label="Product Name" HelperText="Asus rog gaming PC."
+                                      @bind-Value="product.ProductName" For="@(() => product.ProductName)" />
+                        <MudTextField Label="Price" Class="mt-3"
+                                      @bind-Value="product.Price" For="@(() => product.Price)" />
+                        <MudTextField Label="Product Category" HelperText="Component" Class="mt-3"
+                                      @bind-Value="product.ProductCategory" For="@(() => product.ProductCategory)" />
+                        <MudTextField Label="Product Id" HelperText="123898329" Class="mt-3"
+                                      @bind-Value="product.ProductId" For="@(() => product.ProductId)" />
+                        <MudTextField Label="Description" Lines="3" HelperText="This PC is the ultimate gaming pc." Class="mt-3"
+                                      @bind-Value="product.Description" For="@(() => product.Description)" />
+                    </MudCardContent>
+                    <MudStack Spacing="20" Row="true">
+                        <MudCardActions Class="d-flex justify-center">
+                            <MudFileUpload T="IBrowserFile" Accept=".png, .jpg" FilesChanged="UploadFiles2" MaximumFileCount="100" Class="mr-2">
+                                <ActivatorContent>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                                        Add product image
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add Product</MudButton>
+                        </MudCardActions>
+                    </MudStack>
+
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudText Typo="Typo.body2" Align="Align.Center">
+                    @if (success)
+                    {
+                        <MudText Color="Color.Success">Success</MudText>
+                    }
+                    else
+                    {
+                        <MudText Color="@Color.Error">
+                            <ValidationSummary />
+                        </MudText>
+                    }
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+</MudStack>
+
+
 
 
 @code {
@@ -61,8 +73,11 @@
     {
         try
         {
-            await APIClient.PostAsync<string, ProductDTO>("https://localhost:7218/api/Product", product);
-            success = true;
+            if (!string.IsNullOrEmpty(product.ProductId) || string.IsNullOrEmpty(product.ProductName))
+            {
+                await APIClient.PostAsync<string, ProductDTO>("https://localhost:7218/api/Product", product);
+                success = true;
+            }
         }
         catch (Exception ex)
         {

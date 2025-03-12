@@ -1,15 +1,25 @@
-﻿
-<MudNavMenu>
-    
-    <MudNavLink Href="all-products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Products</MudNavLink>
-
-    <AuthorizeView Roles="Admin">
-        <Authorized>
-            <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Edit Products</MudNavLink>
-            <MudNavLink Href="add-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Add a Product</MudNavLink>
-            <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Users</MudNavLink>
-        </Authorized>
-    </AuthorizeView>
+﻿<MudNavMenu>
+    <MudPaper Width="250px" Class="py-3" Elevation="0">
+        <MudNavMenu>
+            <a Href="/">
+                <MudText Typo="Typo.h6" Class="px-4">D-inet</MudText>
+                <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">All your pc stuff in one place.</MudText>
+            </a>
+            <MudDivider Class="my-2" />
+            <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
+            <MudNavGroup Title="Products">
+                <MudNavLink Href="all-products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LaptopChromebook"> All products</MudNavLink>
+            </MudNavGroup>
+            <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavGroup Title="Admin" Expanded="true">
+                                    <MudNavLink Href="add-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add a Product</MudNavLink>
+                                    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Edit Products</MudNavLink>
+                                    <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Users</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
+            <MudNavLink Href="/about">About</MudNavLink>
+        </MudNavMenu>
+    </MudPaper>
 </MudNavMenu>
-
-

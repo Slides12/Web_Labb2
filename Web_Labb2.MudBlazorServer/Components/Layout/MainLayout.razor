@@ -6,26 +6,30 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudLink Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
+        @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+        <a Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
             <MudIcon Icon="@Icons.Material.Filled.Home" Class="mr-1" />
             Dinet
-        </MudLink>
+        </a>
 
         <MudSpacer />
         <AuthorizeView>
             <Authorized>
                 <MudStack Spacing="2" Row>
-                    <MudText>Hello, @context.User.Identity?.Name!  </MudText>
+                    <MudText>Hello, <MudLink href="/user">@context.User.Identity?.Name!</MudLink>  </MudText>
+                    <MudText>|</MudText>
                     <MudLink Href="/logout">Logout</MudLink>
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
                 </MudStack>
             </Authorized>
             <NotAuthorized>
+                <MudStack Spacing="2" Row>
                 <MudText> <a href="/login">Login</a></MudText>
+                <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+                </MudStack>
             </NotAuthorized>
         </AuthorizeView>
         
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
     </MudAppBar>
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
