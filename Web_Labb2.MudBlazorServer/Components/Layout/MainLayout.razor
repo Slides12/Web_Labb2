@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject CartService CartService
+@inject NavigationManager Navigation
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -6,9 +8,8 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+        <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <a Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
-            <MudIcon Icon="@Icons.Material.Filled.Home" Class="mr-1" />
             Dinet
         </a>
 
@@ -19,21 +20,66 @@
                     <MudText>Hello, <MudLink href="/user">@context.User.Identity?.Name!</MudLink>  </MudText>
                     <MudText>|</MudText>
                     <MudLink Href="/logout">Logout</MudLink>
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+                    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+                    <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
+                        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
+                            <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
+                        </MudStack>
+                    </MudIconButton>
+
                 </MudStack>
+
             </Authorized>
             <NotAuthorized>
                 <MudStack Spacing="2" Row>
-                <MudText> <a href="/login">Login</a></MudText>
-                <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+                    <MudText> <a href="/login">Login</a></MudText>
+                    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+                    <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
+                        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
+                            <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
+                        </MudStack>
+                    </MudIconButton>
                 </MudStack>
             </NotAuthorized>
         </AuthorizeView>
-        
+
     </MudAppBar>
+
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
+
+    <MudDrawer @bind-Open="@_open" Anchor="Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary" Width="400px" Height="80%">
+        <MudDrawerHeader>
+            <MudStack Spacing="2" Row=true>
+                <MudText Typo="Typo.h6">Cart</MudText>
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
+                </MudStack>
+            </MudStack>
+        </MudDrawerHeader>
+        <MudList T="ProductDTO">
+            @foreach(var product in CartService.CartItems)
+            {
+                <MudListItem>
+                    <MudStack Spacing="12" Row=true>
+                        <MudButton OnClick="() => GoToProductPage(product.ProductId)">
+                            <MudStack>
+                                <MudText Typo="Typo.subtitle1">@product.ProductName</MudText>
+                                <MudText Typo="Typo.overline" Color="Color.Dark">
+                                    Price: @(product?.Price.ToString("C"))
+                                </MudText>
+                            </MudStack>
+                        </MudButton>
+                        <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" @onclick="() => RemoveCurrentItem(product.ProductId)"/>
+                    </MudStack>
+                </MudListItem>
+            }
+        </MudList>
+    </MudDrawer>
+
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
@@ -48,12 +94,14 @@
 
 @code {
     private bool _drawerOpen = true;
+    private bool _open = false;
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        CartService.OnCartChanged += StateHasChanged;
 
         _theme = new()
         {
@@ -61,6 +109,28 @@
             PaletteDark = _darkPalette,
             LayoutProperties = new LayoutProperties()
         };
+        CartService.LoadCart();
+    }
+
+    private void GoToCart()
+    {
+        Navigation.NavigateTo("/cart");
+    }
+
+    private void GoToProductPage(string productId)
+    {
+        Navigation.NavigateTo($"/product-page/{productId}");
+        StateHasChanged();
+    }
+
+    private async Task RemoveCurrentItem(string productId)
+    {
+        await CartService.RemoveItemFromCart(productId);
+    }
+
+    private void OpenCartDrawer()
+    {
+        _open = true;
     }
 
     private void DrawerToggle()
@@ -117,6 +187,11 @@
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
+
+    public void Dispose()
+    {
+        CartService.OnCartChanged -= StateHasChanged;
+    }
 }
 
 

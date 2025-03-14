@@ -1,45 +1,66 @@
 ﻿@page "/all-products"
 @inject APIClient APIClient
 @inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject CartService CartService
 
-<MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" >
-    @foreach(var product in products)
+<MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+    @foreach (var product in products)
     {
-        if(product.Status == true)
+        if (product.Status == true)
         {
-            <MudLink Margin="5">
-                <MudPaper Height="400px" Width="300px" Class="pa-4" Elevation="3">
-                    <MudGrid>
-                        <MudItem xs="12" sm="12" md="12">
-                                <MudText Typo="Typo.h6">@product.ProductName</MudText>
-                        </MudItem>
-                        <MudItem xs="12" sm="12" md="12">
-                            <MudImage Src="@product.ImagePath" Width="270" Height="150" ></MudImage>
-                        </MudItem>
-                        <MudItem xs="12" sm="12" md="12">
-                            <MudText Typo="Typo.h6">@product.Price kr</MudText>
-                            <MudText Typo="Typo.body2">@product.Description</MudText>
-                        </MudItem>
+            <MudPaper Height="350px" Width="300px" Class="pa-4 d-flex flex-column align-items-center justify-content-between" Elevation="3">
+                <MudGrid Justify="Justify.Center" Align="Center" Class="w-100" Spacing="2">
+                    <MudButton @onclick="() => GoToProductPage(product.ProductId)" Color="Color.Dark">
+                        <MudStack>
+                            <MudItem xs="12" sm="12" md="12">
+                                <MudText Typo="Typo.h6" Class="text-center">@product.ProductName</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" Class="d-flex justify-content-center">
+                                <MudImage Src="@product.ImagePath" Width="270" Height="150"></MudImage>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" Class="text-center">
+                                <MudText Typo="Typo.body2">@product.Description</MudText>
+                            </MudItem>
+                        </MudStack>
+                    </MudButton>
+                </MudGrid>
 
-                        <MudItem xs="12" sm="12" md="6">
-                            <MudIconButton Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Default" />
-                        </MudItem>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+                <div class="align-self-start mt-auto">
+                    <MudText Typo="Typo.h6">@product.Price kr</MudText>
+                    <MudButton @onclick="() => AddProductToCart(product.ProductId)" Variant="Variant.Filled">Add to cart</MudButton>
+                </div>
+            </MudPaper>
         }
     }
 </MudStack>
 
+
+
 @code {
 
     private List<ProductDTO> products = new List<ProductDTO>();
+
+    private List<ProductDTO> cart = new List<ProductDTO>();
+
     protected override async Task OnInitializedAsync()
     {
 
         products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+        await CartService.LoadCart();
 
-       
     }
 
+    private void GoToProductPage(string productId)
+    {
+        Navigation.NavigateTo($"/product-page/{productId}");
+    }
+
+
+    private async Task AddProductToCart(string id)
+    {
+        var product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
+        await CartService.AddToCart(product);
+        Console.WriteLine($"{product.ProductName} added to cart.");
+    }
 }

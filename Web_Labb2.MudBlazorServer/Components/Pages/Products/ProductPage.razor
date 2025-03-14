@@ -1,0 +1,46 @@
+﻿@page "/product-page/{id}"
+@inject APIClient APIClient
+
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-5">
+    <MudCard>
+        <MudCardMedia Image="@product?.ImagePath" Height="600" />
+        <MudCardContent>
+            <MudText Typo="Typo.h5">@product?.ProductName</MudText>
+            <MudText Typo="Typo.subtitle1" Color="Color.Secondary">@product?.ProductCategory</MudText>
+            <MudText Typo="Typo.body1">@product?.Description</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Primary">
+                Price: @(product?.Price.ToString("C"))
+            </MudText>
+            <MudChip T="string" Color="@(product?.Status == true ? Color.Success : Color.Error)">
+                @(product?.Status == true ? "Available" : "Out of Stock")
+            </MudChip>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled">Buy Now</MudButton>
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined">Add to Cart</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    private ProductDTO? product;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadProduct(id);
+        StateHasChanged();
+    }
+
+    private async Task LoadProduct(string productId)
+    {
+        product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
+    }
+}

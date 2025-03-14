@@ -1,0 +1,39 @@
+﻿@page "/cart"
+@inject CartService CartService
+
+<MudContainer>
+    <MudTable Items="CartService.CartItems">
+        <HeaderContent>
+            <MudTh>Product</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Action</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.ProductName</MudTd>
+            <MudTd>@context.Price kr</MudTd>
+            <MudTd>
+                <MudButton Color="Color.Error" OnClick="() => RemoveFromCart(context.ProductId)">Remove</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <MudButton Color="Color.Success" OnClick="ClearCart">Clear Cart</MudButton>
+</MudContainer>
+
+@code {
+    private async Task RemoveFromCart(ProductDTO product)
+    {
+        CartService.CartItems.Remove(product);
+        await CartService.AddToCart(null); // Update local storage
+    }
+
+    private async Task ClearCart()
+    {
+        await CartService.ClearCart();
+    }
+
+    private async Task RemoveFromCart(string id)
+    {
+        await CartService.RemoveItemFromCart(id);
+    }
+}

@@ -3,6 +3,9 @@
 @inject ISnackbar Snackbar
 @attribute [Authorize(Roles = "Admin")]
 
+<MudText Typo="Typo.h3" GutterBottom="true">-Admin-</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Add product.</MudText>
+
 <MudStack Spacing="20" Class="w-100 d-flex justify-center align-center mt-5">
     <MudPaper Elevation="3">
         <MudText Typo="Typo.h5" Align="Align.Center" >Add a product below, you can also add a image for this product. After creation it will not be visible until you set "Status" to true in "Edit products"</MudText>
