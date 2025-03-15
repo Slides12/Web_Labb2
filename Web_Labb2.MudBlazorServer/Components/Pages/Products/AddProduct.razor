@@ -79,6 +79,8 @@
             if (!string.IsNullOrEmpty(product.ProductId) || string.IsNullOrEmpty(product.ProductName))
             {
                 await APIClient.PostAsync<string, ProductDTO>("https://localhost:7218/api/Product", product);
+                Snackbar.Add($"{product.ProductName} added.", Severity.Success);
+
                 success = true;
             }
         }

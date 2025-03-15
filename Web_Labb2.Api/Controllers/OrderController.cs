@@ -50,6 +50,7 @@ namespace Web_Labb2.Api.Controllers
             }
 
             var result = await _orderService.CreateOrderAsync(value);
+
             if (result == null)
             {
                 return BadRequest("Failed to create order. Please check the provided details.");
@@ -57,6 +58,7 @@ namespace Web_Labb2.Api.Controllers
 
             return CreatedAtAction(nameof(GetOrderById), new { id = result.OrderID }, result);
         }
+
 
 
         // PUT api/<OrderController>/5

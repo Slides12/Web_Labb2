@@ -3,6 +3,8 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject CartService CartService
+@inject ISnackbar Snackbar
+
 
 <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
     @foreach (var product in products)
@@ -61,6 +63,8 @@
     {
         var product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
         await CartService.AddToCart(product);
-        Console.WriteLine($"{product.ProductName} added to cart.");
+        Console.WriteLine();
+        Snackbar.Add($"{product.ProductName} added to cart.", Severity.Success);
+
     }
 }

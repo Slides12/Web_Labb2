@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Web_Labb2.Migrations
+namespace Web_Labb2.Api.Migrations
 {
     [DbContext(typeof(APIDBContext))]
-    [Migration("20250305182634_AddOrders")]
-    partial class AddOrders
+    [Migration("20250315115535_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,25 +81,59 @@ namespace Web_Labb2.Migrations
                     b.ToTable("CustomerEntitys");
                 });
 
-            modelBuilder.Entity("ProductEntity", b =>
+            modelBuilder.Entity("OrderDetail", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderDetailID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderDetailID"));
+
+                    b.Property<int>("OrderID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderInfoOrderID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("ProductEntityProductId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProductID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderDetailID");
+
+                    b.HasIndex("OrderInfoOrderID");
+
+                    b.HasIndex("ProductEntityProductId");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("ProductEntity", b =>
+                {
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("ProductCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -110,33 +144,9 @@ namespace Web_Labb2.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId");
 
                     b.ToTable("ProductEntitys");
-                });
-
-            modelBuilder.Entity("Web_Labb2.Shared.Models.OrderDetail", b =>
-                {
-                    b.Property<int>("OrderID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderDetailID")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderID", "OrderDetailID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("Web_Labb2.Shared.Models.OrderInfo", b =>
@@ -154,7 +164,7 @@ namespace Web_Labb2.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("OrderID");
 
@@ -170,6 +180,10 @@ namespace Web_Labb2.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -196,16 +210,20 @@ namespace Web_Labb2.Migrations
                     b.Navigation("AddressInformation");
                 });
 
-            modelBuilder.Entity("Web_Labb2.Shared.Models.OrderDetail", b =>
+            modelBuilder.Entity("OrderDetail", b =>
                 {
                     b.HasOne("Web_Labb2.Shared.Models.OrderInfo", "OrderInfo")
                         .WithMany("OrderDetails")
-                        .HasForeignKey("OrderID")
+                        .HasForeignKey("OrderInfoOrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProductEntity", "Product")
+                    b.HasOne("ProductEntity", null)
                         .WithMany("OrderDetails")
+                        .HasForeignKey("ProductEntityProductId");
+
+                    b.HasOne("ProductEntity", "Product")
+                        .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

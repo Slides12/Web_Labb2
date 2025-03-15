@@ -1,9 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Web_Labb2.Shared.Models;
 
 public class ProductEntity
 {
-    public int Id { get; set; }
+    [Key]
     public required string ProductId { get; set; }
     public required string ProductName { get; set; }
     public string? Description { get; set; }

@@ -17,7 +17,12 @@ public class APIDBContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<OrderDetail>()
-            .HasKey(od => new { od.OrderID, od.OrderDetailID });
+            .HasKey(od => od.OrderDetailID);
+
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Product)
+            .WithMany()
+            .HasForeignKey(od => od.ProductID);
     }
 
 }

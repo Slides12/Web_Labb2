@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Web_Labb2.Api.Services;
 using Web_Labb2.Data;
 using Web_Labb2.DTO_s;
+using Web_Labb2.Shared.DTO_s;
 
 
 namespace Web_Labb2.Services
@@ -27,7 +28,13 @@ namespace Web_Labb2.Services
                 FirstName = c.FirstName,
                 LastName = c.LastName,
                 Email = c.Email,
-                AddressInformation = c.AddressInformation,
+                AddressInformation = new AddressDTO
+                {
+                    Address = c.AddressInformation?.Address,
+                    PostNumber = c.AddressInformation?.PostNumber,
+                    City = c.AddressInformation?.City,
+                    Country = c.AddressInformation?.Country
+                },
                 PhoneNumber = c.PhoneNumber,
             });
         }
@@ -46,7 +53,13 @@ namespace Web_Labb2.Services
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
                     Email = customer.Email,
-                    AddressInformation = customer.AddressInformation,
+                    AddressInformation = new AddressDTO
+                    {
+                        Address = customer.AddressInformation?.Address,
+                        PostNumber = customer.AddressInformation?.PostNumber,
+                        City = customer.AddressInformation?.City,
+                        Country = customer.AddressInformation?.Country
+                    },
                     PhoneNumber = customer.PhoneNumber,
 
                 };
@@ -58,31 +71,37 @@ namespace Web_Labb2.Services
 
         public async Task<bool> AddCustomerAsync(CustomerDTO customer)
         {
-            if(!string.IsNullOrEmpty(customer.FirstName) || !string.IsNullOrEmpty(customer.Email))
+            if (string.IsNullOrEmpty(customer.FirstName) || string.IsNullOrEmpty(customer.Email))
             {
-                var customerEmail = await _unitOfWork.Customers.GetCustomerByEmailAsync(customer.Email);
-
-                if(customerEmail is null) 
-                { 
-                    await _unitOfWork.Customers.AddCustomerAsync(new CustomerEntity() { 
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName,
-                        Email = customer.Email,
-                        AddressInformation = new AddressEntity()
-                        {
-                            Address = customer.AddressInformation.Address,
-                            PostNumber = customer.AddressInformation.PostNumber,
-                            City = customer.AddressInformation.City,
-                            Country = customer.AddressInformation.Country,
-                        },
-                        PhoneNumber = customer.PhoneNumber,
-                    });
-                    await _unitOfWork.SaveChangesAsync();
-                    return true;
-                }
+                return false;
             }
-            return false;
+
+            var existingCustomer = await _unitOfWork.Customers.GetCustomerByEmailAsync(customer.Email);
+
+            if (existingCustomer != null)
+            {
+                return false;
+            }
+
+            await _unitOfWork.Customers.AddCustomerAsync(new CustomerEntity()
+            {
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email,
+                AddressInformation = new AddressEntity()
+                {
+                    Address = customer.AddressInformation.Address,
+                    PostNumber = customer.AddressInformation.PostNumber,
+                    City = customer.AddressInformation.City,
+                    Country = customer.AddressInformation.Country,
+                },
+                PhoneNumber = customer.PhoneNumber,
+            });
+
+            await _unitOfWork.SaveChangesAsync();
+            return true;
         }
+
 
         public async Task<bool> DeleteCustomerByEmail(string email)
         {

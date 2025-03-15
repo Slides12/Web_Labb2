@@ -1,4 +1,6 @@
-﻿namespace Web_Labb2.DTO_s
+﻿using Web_Labb2.Shared.DTO_s;
+
+namespace Web_Labb2.DTO_s
 {
     public class CustomerDTO
     {
@@ -7,6 +9,6 @@
         public required string LastName { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public AddressEntity? AddressInformation { get; set; }
+        public AddressDTO? AddressInformation { get; set; }
     }
 }

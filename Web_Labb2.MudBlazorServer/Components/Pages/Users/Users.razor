@@ -28,7 +28,6 @@ else
             <MudTd DataLabel="Email">@context.Email</MudTd>
             @if (isAdmin)
             {
-                <MudTd><MudButton >Status</MudButton></MudTd>
                 <MudTd><MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@((e) => UpdateUser(context))">Update</MudButton></MudTd>
                 <MudTd><MudButton @onclick="() => DeleteUser(context.Username)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton></MudTd>
             }
