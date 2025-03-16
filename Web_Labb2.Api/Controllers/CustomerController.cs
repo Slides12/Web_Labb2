@@ -42,21 +42,28 @@ namespace Web_Labb2.Controllers
 
         // POST api/<CustomerController>
         [HttpPost]
-        public async Task<ActionResult> PostCustomer([FromBody] CustomerDTO value)
+        public async Task<ActionResult<CustomerDTO>> PostCustomer([FromBody] CustomerDTO value)
         {
-            if(value != null)
-            { 
-                var result = await _customerService.AddCustomerAsync(value);
-                if(!result)
-                {
-                    return BadRequest("You need to add all information of the customer or the email is allready in use. Try again.");
-                }
+            if (value == null)
+            {
+                return BadRequest("Customer data is missing.");
             }
-            return Created("Added to the DB",value);
 
+            var result = await _customerService.AddCustomerAsync(value);
+
+            if (!result)
+            {
+                return BadRequest("Invalid data: Either missing fields or email is already in use.");
+            }
+
+            var customer = await _customerService.GetCustomerByEmail(value.Email);
+
+            return Ok(customer);
         }
 
-      
+
+
+
         // DELETE api/<CustomerController>/5
         [HttpDelete("{email}")]
         public async Task<ActionResult> DeleteCustomerByEmail(string email)

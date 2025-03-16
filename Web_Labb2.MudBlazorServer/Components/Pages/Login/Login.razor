@@ -36,7 +36,7 @@
                 }
             </MudText>
         </MudItem>
-        
+
     </MudGrid>
 </EditForm>
 
@@ -52,7 +52,8 @@
         if(res != null && res.Token != null)
         {
             success = true;
-            ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
+            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
+            await ((CustomAuthStateProvider)AuthStateProvider).StoreUserEmail(res.Email);
             Navigation.NavigateTo("/dashboard");
         }
     }

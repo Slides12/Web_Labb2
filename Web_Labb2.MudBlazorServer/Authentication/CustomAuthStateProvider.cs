@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using static MudBlazor.Colors;
 
 namespace Web_Labb2.BlazorServer.Authentication
 {
@@ -29,6 +31,17 @@ namespace Web_Labb2.BlazorServer.Authentication
             var jwtToken = handler.ReadJwtToken(token);
             var claims = jwtToken.Claims;
             return new ClaimsIdentity(claims, "jwt");
+        }
+
+        public async Task StoreUserEmail(string email)
+        {
+            await localStorage.SetAsync("userEmail", email);
+        }
+
+        public async Task<string?> GetStoredUserEmail()
+        {
+            var result = await localStorage.GetAsync<string>("userEmail");
+            return result.Value;
         }
 
         public async Task MarkUserAsLoggedOut()

@@ -21,7 +21,7 @@ namespace Web_Labb2.Api.Controllers
 
         // GET: api/<OrderController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllCustomers()
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllOrders()
         {
             var customers = await _orderService.GetAllOrdersAsync();
             return Ok(customers);
@@ -29,12 +29,24 @@ namespace Web_Labb2.Api.Controllers
 
         // GET api/<OrderController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CustomerDTO>> GetOrderById(int id)
+        public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
         {
             var result = await _orderService.GetOrderById(id);
             if (result == null)
             {
                 return BadRequest("Order not found");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet("orders/{customerId}")]
+        public async Task<ActionResult<List<OrderDTO>>> GetOrdersByCustomerId(int customerId)
+        {
+            var result = await _orderService.GetOrdersByCustomerId(customerId);
+            if (result == null)
+            {
+                return BadRequest("Orders not found");
             }
 
             return Ok(result);
@@ -63,7 +75,7 @@ namespace Web_Labb2.Api.Controllers
 
         // PUT api/<OrderController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCustomerByEmail(int id, [FromBody] OrderDTO updatedOrder)
+        public async Task<ActionResult> UpdateOrderByEmail(int id, [FromBody] OrderDTO updatedOrder)
         {
             
             if (updatedOrder.OrderID == null || updatedOrder.CustomerID == null || updatedOrder.OrderDetails == null)
@@ -82,7 +94,7 @@ namespace Web_Labb2.Api.Controllers
 
         // DELETE api/<OrderController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCustomerByEmail(int id)
+        public async Task<ActionResult> DeleteOrderByEmail(int id)
         {
             if (id == null)
             {

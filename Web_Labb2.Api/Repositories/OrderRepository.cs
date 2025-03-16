@@ -33,6 +33,11 @@ namespace Web_Labb2.Api.Repositories
             return await _context.Orders.Include(o => o.OrderDetails).FirstOrDefaultAsync(o => o.OrderID == orderId);
         }
 
+        public async Task<IEnumerable<OrderInfo>> GetOrdersByCustomerIdAsync(int customerId)
+        {
+            return await _context.Orders.Where(o => o.CustomerID == customerId).Include(o => o.OrderDetails).ToListAsync();
+        }
+
         public void UpdateOrderAsync(OrderInfo order)
         {
             _context.Orders.Update(order);

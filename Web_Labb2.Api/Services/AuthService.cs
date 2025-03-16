@@ -61,7 +61,7 @@ namespace Web_Labb2.Api.Services
             }
 
 
-            return new AuthResult { IsValid = true, Role = user.Role };
+            return new AuthResult { IsValid = true, Role = user.Role, Email = user.Email };
 
         }
 

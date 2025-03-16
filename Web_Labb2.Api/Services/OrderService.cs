@@ -71,6 +71,27 @@ namespace Web_Labb2.Api.Services
             });
         }
 
+        public async Task<IEnumerable<OrderDTO>> GetOrdersByCustomerId(int customerId)
+        {
+            var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
+
+            return orders.Select(o => new OrderDTO
+            {
+                OrderID = o.OrderID,
+                CustomerID = o.CustomerID,
+                OrderDate = o.OrderDate,
+                TotalAmount = o.TotalAmount,
+                OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    OrderDetailID = od.OrderDetailID,
+                    ProductID = od.ProductID,
+                    Quantity = od.Quantity,
+                    Price = od.Price
+                }).ToList()
+            });
+        }
+
+
         public Task<OrderInfo> GetOrderById(int order)
         {
             var getOrder = _unitOfWork.Orders.GetOrdersByIdAsync(order);

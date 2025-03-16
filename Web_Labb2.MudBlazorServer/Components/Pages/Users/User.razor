@@ -1,7 +1,76 @@
 ﻿@page "/user"
+@inject APIClient APIClient
+@inject AuthenticationStateProvider AuthStateProvider
 
 <h3>User</h3>
 
-@code {
+<MudList T="OrderDTO">
+    @foreach (var order in orders)
+    {
+        <MudListItem>
+            <MudText><b>Order ID:</b> @order.OrderID</MudText>
+            <MudText><b>Customer ID:</b> @customer.Id</MudText>
+            <MudText><b>First Name:</b> @customer.FirstName</MudText>
+            <MudText><b>Last Name:</b> @customer.LastName</MudText>
 
+            <!-- Order Details -->
+            @if (order.OrderDetails != null && order.OrderDetails.Any())
+            {
+                <MudList T="OrderDetailDTO">
+                    @foreach (var od in order.OrderDetails)
+                    {
+                        <MudListItem>
+                            <MudText><b>Product ID:</b> @od.ProductID</MudText>
+                            <MudText><b>Quantity:</b> @od.Quantity</MudText>
+                            <MudText><b>Price:</b> @od.Price</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+            else
+            {
+                <MudText>No order details available.</MudText>
+            }
+        </MudListItem>
+    }
+</MudList>
+
+@code {
+    private int customerId;
+    private List<OrderDTO> orders = new List<OrderDTO>();
+    private CustomerDTO customer = new CustomerDTO() { FirstName="", LastName=""};
+
+    protected override async Task OnInitializedAsync()
+    {
+        var email = await ((CustomAuthStateProvider)AuthStateProvider).GetStoredUserEmail();
+
+        if (string.IsNullOrEmpty(email))
+        {
+            Console.WriteLine("Error: No email found in local storage!");
+            return;
+        }
+
+        try
+        {
+             customer = await APIClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{email}");
+
+            if (customer == null)
+            {
+                Console.WriteLine("Error: Customer not found.");
+                return;
+            }
+
+            customerId = customer.Id;
+            orders = await APIClient.GetFromJsonAsync<List<OrderDTO>>($"https://localhost:7218/api/Order/orders/{customerId}");
+
+            if (orders == null || orders.Count == 0)
+            {
+                Console.WriteLine("No orders found for this customer.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"API Error: {ex.Message}");
+        }
+    }
 }

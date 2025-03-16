@@ -7,72 +7,79 @@
 
 <EditForm Model="@customer" OnValidSubmit="SubmitCustomerAndOrder">
     <DataAnnotationsValidator />
-    <MudGrid>
-        <MudItem xs="12" sm="6">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6">Customer Information</MudText>
-                    <MudTextField Label="First Name" HelperText="Enter your first name"
-                    @bind-Value="customer.FirstName" For="@(() => customer.FirstName)" />
-                    <MudTextField Label="Last Name" HelperText="Enter your last name"
-                    @bind-Value="customer.LastName" For="@(() => customer.LastName)" />
-                    <MudTextField Label="Email" HelperText="Enter your email address"
-                    @bind-Value="customer.Email" For="@(() => customer.Email)" />
-                    <MudTextField Label="Phone Number" HelperText="Enter your phone number"
-                    @bind-Value="customer.PhoneNumber" For="@(() => customer.PhoneNumber)" />
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+    <MudStack Row=true>
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Customer Information</MudText>
+                        <MudTextField Label="First Name" HelperText="Enter your first name"
+                        @bind-Value="customer.FirstName" For="@(() => customer.FirstName)" />
+                        <MudTextField Label="Last Name" HelperText="Enter your last name"
+                        @bind-Value="customer.LastName" For="@(() => customer.LastName)" />
+                        <MudTextField Label="Email" HelperText="Enter your email address"
+                        @bind-Value="customer.Email" For="@(() => customer.Email)" />
+                        <MudTextField Label="Phone Number" HelperText="Enter your phone number"
+                        @bind-Value="customer.PhoneNumber" For="@(() => customer.PhoneNumber)" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
 
-        <!-- Address Information Section -->
-        <MudItem xs="12" sm="6">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6">Address Information</MudText>
-                    <MudTextField Label="Address" HelperText="Enter your address"
-                    @bind-Value="customer.AddressInformation.Address" For="@(() => customer.AddressInformation.Address)" />
-                    <MudTextField Label="Post Number" HelperText="Enter your post number"
-                    @bind-Value="customer.AddressInformation.PostNumber" For="@(() => customer.AddressInformation.PostNumber)" />
-                    <MudTextField Label="City" HelperText="Enter your city"
-                    @bind-Value="customer.AddressInformation.City" For="@(() => customer.AddressInformation.City)" />
-                    <MudTextField Label="Country" HelperText="Enter your country"
-                    @bind-Value="customer.AddressInformation.Country" For="@(() => customer.AddressInformation.Country)" />
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Address Information</MudText>
+                        <MudTextField Label="Address" HelperText="Enter your address"
+                        @bind-Value="customer.AddressInformation.Address" For="@(() => customer.AddressInformation.Address)" />
+                        <MudTextField Label="Post Number" HelperText="Enter your post number"
+                        @bind-Value="customer.AddressInformation.PostNumber" For="@(() => customer.AddressInformation.PostNumber)" />
+                        <MudTextField Label="City" HelperText="Enter your city"
+                        @bind-Value="customer.AddressInformation.City" For="@(() => customer.AddressInformation.City)" />
+                        <MudTextField Label="Country" HelperText="Enter your country"
+                        @bind-Value="customer.AddressInformation.Country" For="@(() => customer.AddressInformation.Country)" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
 
-        <MudItem xs="12" sm="6">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6">Order Information</MudText>
-                    <MudTextField Label="Order Date" HelperText="Select the Order Date" Type="date"
-                    @bind-Value="order.OrderDate" For="@(() => order.OrderDate)" />
-                    <MudTextField Label="Total Amount" HelperText="Calculated automatically" Disabled
-                    @bind-Value="order.TotalAmount" For="@(() => order.TotalAmount)" />
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
 
-        <MudItem xs="12">
-            <MudPaper Class="pa-4 mud-height-full">
-                <MudText Typo="Typo.subtitle2">Order Summary</MudText>
-                <MudList T="OrderDTO">
-                    @foreach (var item in order.OrderDetails)
-                    {
-                        <MudListItem>
-                            <MudText>Product ID: @item.ProductID</MudText>
-                            <MudText>Quantity: @item.Quantity</MudText>
-                            <MudText>Price: @item.Price</MudText>
-                        </MudListItem>
-                    }
-                </MudList>
-            </MudPaper>
-        </MudItem>
+        </MudGrid>
 
-        <MudItem xs="12">
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit Order</MudButton>
-        </MudItem>
-    </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">Order Information</MudText>
+                        <MudTextField Label="Order Date" HelperText="Date of order" Type="date" Disabled
+                        @bind-Value="order.OrderDate" For="@(() => order.OrderDate)" />
+                        <MudTextField Label="Total Amount" HelperText="Total amount in kr." Disabled
+                        @bind-Value="order.TotalAmount" For="@(() => order.TotalAmount)" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudPaper Class="pa-4 mud-height-full">
+                    <MudText Typo="Typo.subtitle2">Order Summary</MudText>
+                    <MudList T="OrderDTO">
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <MudListItem>
+                                <MudText>Product ID: @item.ProductID</MudText>
+                                <MudText>Quantity: @item.Quantity</MudText>
+                                <MudText>Price: @item.Price</MudText>
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudButton Disabled="@empty" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit Order</MudButton>
+            </MudItem>
+        </MudGrid>
+
+    </MudStack>
+
 </EditForm>
 
 <MudSnackbarProvider />
@@ -81,18 +88,23 @@
     private CustomerDTO customer = new CustomerDTO() { FirstName="", LastName=""};
 
     private OrderDTO order = new OrderDTO();
+    private bool empty = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Initialize customer
         customer = new CustomerDTO()
             {
                 FirstName = "",
                 LastName = "",
-                AddressInformation = new AddressDTO() // Initialize Address Information
+                AddressInformation = new AddressDTO()
+                {
+                    Address = "",
+                    City = "",
+                    Country = "",
+                    PostNumber = ""
+                }
             };
 
-        // Initialize order with customer
         order = new OrderDTO
             {
                 OrderDate = DateTime.Now,
@@ -100,46 +112,45 @@
                 Customer = customer
             };
 
-        // Load the cart items
         await CartService.LoadCart();
 
-        // Populate the OrderDetails from CartItems
         order.OrderDetails = CartService.CartItems.Select(p => new OrderDetailDTO
             {
                 ProductID = p.ProductId,
-                Quantity = 1,  // Assuming quantity is 1 for each item
+                Quantity = 1,
                 Price = p.Price
             }).ToList();
 
-        // Calculate TotalAmount
+        empty = order.OrderDetails.Count == 0;
         order.TotalAmount = order.OrderDetails.Sum(d => d.Price * d.Quantity);
     }
 
+
     private async Task SubmitCustomerAndOrder()
     {
+        
+
         try
         {
-            // Step 1: Submit the customer information
-            var customerResponse = await ApiClient.PostAsync<CustomerDTO, CustomerDTO>("https://localhost:7218/api/Customer", customer);
 
-            if (customerResponse != null)
+            var existingCustomer = await ApiClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{customer.Email}");
+
+            if (existingCustomer != null)
             {
-                // Step 2: Assign the CustomerID from the response after customer creation
-                order.CustomerID = customerResponse.Id; // Ensure the CustomerID is set before submitting the order
 
-                // Step 3: Check if the order details are valid
+                order.CustomerID = existingCustomer.Id;
+                order.Customer = existingCustomer;
+
                 if (order.OrderDetails == null || !order.OrderDetails.Any())
                 {
                     Console.WriteLine("Error: Order details are missing.");
                     return;
                 }
 
-                // Step 4: Submit the order with the CustomerID set
                 var orderResponse = await ApiClient.PostAsync<OrderDTO, OrderDTO>("https://localhost:7218/api/Order", order);
 
                 if (orderResponse != null)
                 {
-                    // Clear the cart after order submission
                     await CartService.ClearCart();
                     Console.WriteLine("Order submitted successfully: " + orderResponse.OrderID);
                 }
@@ -150,7 +161,33 @@
             }
             else
             {
-                Console.WriteLine("Failed to submit customer info.");
+                Console.WriteLine("Customer does not exist. Creating new customer...");
+
+                var customerResponse = await ApiClient.PostAsync<CustomerDTO, CustomerDTO>("https://localhost:7218/api/Customer", customer);
+
+                if (customerResponse != null)
+                {
+                    Console.WriteLine("Customer created with ID: " + customerResponse.Id);
+
+                    order.CustomerID = customerResponse.Id;
+                    order.Customer = customer;
+
+                    if (order.OrderDetails == null || !order.OrderDetails.Any())
+                    {
+                        Console.WriteLine("Error: Order details are missing.");
+                        return;
+                    }
+
+                    Console.WriteLine("Submitting order...");
+                    var orderResponse = await ApiClient.PostAsync<OrderDTO, OrderDTO>("https://localhost:7218/api/Order", order);
+
+                    if (orderResponse != null)
+                    {
+                        await CartService.ClearCart();
+                        Console.WriteLine("Order submitted successfully: " + orderResponse.OrderID);
+                    }
+                }
+                
             }
         }
         catch (Exception ex)
@@ -158,9 +195,5 @@
             Console.WriteLine("Error submitting customer and order: " + ex.Message);
         }
     }
-
-
-
-
 
 }
