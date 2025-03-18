@@ -8,42 +8,45 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <a Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
-            Dinet
+            <MudImage Width="130" Height="100" Src="D-inet.png"></MudImage>
         </a>
 
         <MudSpacer />
-        <AuthorizeView>
-            <Authorized>
-                <MudStack Spacing="2" Row>
-                    <MudText>Hello, <MudLink href="/user">@context.User.Identity?.Name!</MudLink>  </MudText>
-                    <MudText>|</MudText>
-                    <MudLink Href="/logout">Logout</MudLink>
-                    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-                    <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
-                        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
-                            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
-                            <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
-                        </MudStack>
-                    </MudIconButton>
-
+       <AuthorizeView>
+    <Authorized>
+        <MudStack Spacing="2" Row>
+            <MudText Color="Color.Inherit">
+                Hello, <MudLink href="/user" Color="Color.Inherit">@context.User.Identity?.Name!</MudLink>
+            </MudText>
+            <MudText>|</MudText>
+            <MudLink Href="/logout" Color="Color.Inherit">Logout</MudLink>
+            <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+            <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
+                    <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
                 </MudStack>
-
-            </Authorized>
-            <NotAuthorized>
-                <MudStack Spacing="2" Row>
-                    <MudText> <a href="/login">Login</a></MudText>
-                    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-                    <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
-                        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
-                            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
-                            <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
-                        </MudStack>
-                    </MudIconButton>
+            </MudIconButton>
+        </MudStack>
+    </Authorized>
+    <NotAuthorized>
+        <MudStack Spacing="2" Row>
+            <MudText Color="Color.Inherit">
+                <MudLink href="/login" Color="Color.Inherit">Login</MudLink>
+            </MudText>
+            <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+            <MudIconButton Color="Color.Inherit" OnClick="@OpenCartDrawer">
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
+                    <MudBadge Content="@CartService.CartItems.Count" Color="Color.Primary" Class="position-absolute" Style="top: -5px; right: -5px;" />
                 </MudStack>
-            </NotAuthorized>
-        </AuthorizeView>
+            </MudIconButton>
+        </MudStack>
+    </NotAuthorized>
+</AuthorizeView>
+
 
     </MudAppBar>
 
@@ -148,28 +151,30 @@
         Black = "#110e2d",
         AppbarText = "#424242",
         AppbarBackground = "rgba(255,255,255,0.8)",
-        DrawerBackground = "#ffffff",
+        DrawerBackground = "rgba(255,255,255,0.8)",
         GrayLight = "#e8e8e8",
         GrayLighter = "#f9f9f9",
+        Background = "#E5E4E2",
+
     };
 
     private readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
-        BackgroundGray = "#151521",
+        Primary = "#343434",
+        Surface = "#343434",
+        Background = "#343434",
+        BackgroundGray = "#343434",
         AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
+        AppbarBackground = "#343434",
+        DrawerBackground = "#343434",
         ActionDefault = "#74718e",
         ActionDisabled = "#9999994d",
         ActionDisabledBackground = "#605f6d4d",
-        TextPrimary = "#b2b0bf",
-        TextSecondary = "#92929f",
+        TextPrimary = "#FFFFFF",
+        TextSecondary = "#FFFFFF",
         TextDisabled = "#ffffff33",
         DrawerIcon = "#92929f",
-        DrawerText = "#92929f",
+        DrawerText = "#FFFFFF",
         GrayLight = "#2a2833",
         GrayLighter = "#1e1e2d",
         Info = "#4a86ff",

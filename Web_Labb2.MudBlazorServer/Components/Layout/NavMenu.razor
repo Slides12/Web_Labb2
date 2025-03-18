@@ -1,25 +1,45 @@
-﻿<MudNavMenu>
+﻿@inject APIClient APIClient
+
+<MudNavMenu>
     <MudPaper Width="250px" Class="py-3" Elevation="0">
         <MudNavMenu>
             <a Href="/">
-                <MudText Typo="Typo.h6" Class="px-4">D-inet</MudText>
+                <MudImage Width="100" Height="80" Src="D-inet.png"></MudImage>
                 <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">All your pc stuff in one place.</MudText>
             </a>
             <MudDivider Class="my-2" />
             <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
             <MudNavGroup Title="Products" Expanded="true">
-                <MudNavLink Href="all-products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LaptopChromebook"> All products</MudNavLink>
+                <MudNavLink Href="all-products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LaptopChromebook">All products</MudNavLink>
+                @foreach(var category in categories)
+                {
+                    string categoryHref = $"/categories/{category}";
+                    <MudNavLink Icon="@Icons.Material.Filled.LaptopChromebook" Href="@categoryHref" Match="NavLinkMatch.Prefix">@category</MudNavLink>
+                }
             </MudNavGroup>
             <AuthorizeView Roles="Admin">
-                    <Authorized>
-                        <MudNavGroup Title="Admin" Expanded="true">
-                                    <MudNavLink Href="add-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add a Product</MudNavLink>
-                                    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Edit Products</MudNavLink>
-                                    <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Users</MudNavLink>
-                        </MudNavGroup>
-                    </Authorized>
-                </AuthorizeView>
+                <Authorized>
+                    <MudNavGroup Title="Admin" Expanded="true">
+                        <MudNavLink Href="add-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Add a Product</MudNavLink>
+                        <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Edit Products</MudNavLink>
+                        <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Edit">Users</MudNavLink>
+                    </MudNavGroup>
+                </Authorized>
+            </AuthorizeView>
             <MudNavLink Href="/about">About</MudNavLink>
         </MudNavMenu>
     </MudPaper>
 </MudNavMenu>
+
+@code
+{
+    private List<ProductDTO> products = new List<ProductDTO>();
+    private List<string> categories = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
+        
+        categories = products.Select(p => p.ProductCategory).Distinct().ToList();
+    }
+}
