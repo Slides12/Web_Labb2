@@ -1,5 +1,7 @@
 ﻿@page "/product-page/{id}"
 @inject APIClient APIClient
+@inject CartService CartService
+@inject ISnackbar Snackbar
 
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-5">
@@ -17,8 +19,7 @@
             </MudChip>
         </MudCardContent>
         <MudCardActions>
-            <MudButton Color="Color.Primary" Variant="Variant.Filled">Buy Now</MudButton>
-            <MudButton Color="Color.Secondary" Variant="Variant.Outlined">Add to Cart</MudButton>
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" @onclick="() => AddProductToCart(product.ProductId)">Add to Cart</MudButton>
         </MudCardActions>
     </MudCard>
 </MudContainer>
@@ -42,5 +43,14 @@
     protected override async Task OnInitializedAsync()
     {
         product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
+    }
+
+    private async Task AddProductToCart(string id)
+    {
+        var product = await APIClient.GetFromJsonAsync<ProductDTO>($"https://localhost:7218/api/Product/id/{id}");
+        await CartService.AddToCart(product);
+        Console.WriteLine();
+        Snackbar.Add($"{product.ProductName} added to cart.", Severity.Success);
+
     }
 }

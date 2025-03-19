@@ -45,8 +45,10 @@
 
     private List<ProductDTO> categoryProducts = new List<ProductDTO>();
 
-    protected async override Task OnInitializedAsync()
+    protected async override Task OnParametersSetAsync()
     {
+        categoryProducts.Clear();
+
         List<ProductDTO> products = await APIClient.GetFromJsonAsync<List<ProductDTO>>("https://localhost:7218/api/Product");
         categoryProducts = products.Where(p => p.ProductCategory.Equals(category)).ToList();
 

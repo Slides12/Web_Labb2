@@ -7,13 +7,14 @@
 
 <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
 
-    <MudCarousel Class="mud-width-full" @ref="_carousel" ItemsSource="@products" @bind-SelectedIndex="selectedIndex" Style="height:400px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true">
+    <MudCarousel Class="mud-width-full" @ref="_carousel" ItemsSource="@products" @bind-SelectedIndex="selectedIndex" Style="height:400px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true">
         <ItemTemplate>
             <div class="d-flex flex-column justify-center align-items-center" style="height:100%">
                 <MudButton @onclick="() => GoToProductPage(context.ProductId)" Color="Color.Dark">
                     <MudStack>
                         <img src="@context.ImagePath" alt="@context.ProductName" style="max-height:300px; object-fit:contain;" />
                         <MudText Align="@Align.Center" Class="mt-2">@context.ProductName</MudText>
+                        <MudText Align="@Align.Center" Class="mt-2"> Price: @(context?.Price.ToString("C"))</MudText>
                     </MudStack>
                 </MudButton>
             </div>
@@ -28,18 +29,19 @@
         <MudButton Href="/all-products">You can find all products here.</MudButton>
     </MudAlert>
 
-    <MudText Typo="Typo.h5" GutterBottom="true">Categories</MudText>
+   <MudText Typo="Typo.h5" GutterBottom="true">Categories</MudText>
 
-    <MudStack Row=true>
-        <MudList T="ProductDTO">
-            @foreach(var product in products)
-            {
-                <MudButton @onclick="() => GoToCategoryPage(product.ProductCategory)" Variant="Variant.Outlined" Size="Size.Large">@product.ProductCategory</MudButton>
-            }
-            <MudItem>
-            </MudItem>
-        </MudList>
-    </MudStack>
+<MudStack Row=true>
+    <MudList T="string">
+        @foreach (var category in products.Select(p => p.ProductCategory).Distinct().Take(5))
+        {
+            <MudButton @onclick="() => GoToCategoryPage(category)" Variant="Variant.Outlined" Size="Size.Large">
+                @category
+            </MudButton>
+        }
+    </MudList>
+</MudStack>
+
 
 </MudStack>
 

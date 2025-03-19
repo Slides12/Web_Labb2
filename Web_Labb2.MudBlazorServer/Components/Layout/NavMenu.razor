@@ -1,12 +1,31 @@
 ﻿@inject APIClient APIClient
+@inject NavigationManager Navigation
 
 <MudNavMenu>
     <MudPaper Width="250px" Class="py-3" Elevation="0">
         <MudNavMenu>
             <a Href="/">
-                <MudImage Width="100" Height="80" Src="D-inet.png"></MudImage>
+                @* <MudImage Width="100" Height="80" Src="D-inet.png"></MudImage> *@
                 <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">All your pc stuff in one place.</MudText>
             </a>
+            <MudStack>
+            <MudTextField Label="Search..." Variant="Variant.Outlined" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" Value="@SearchQuery"
+            ValueChanged="@( (string v) => FilterProducts(v) )" Immediate="true" />
+
+            <MudPopover Open="@ShowSearchResults" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                <MudPaper Class="pa-2" Elevation="4" Width="300px">
+                    <MudList T="ProductDTO">
+                        @foreach (var product in FilteredProducts)
+                        {
+                            <MudListItem Button="true" OnClick="() => GoToProductPage(product.ProductId)">
+                                @product.ProductName
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudPaper>
+            </MudPopover>
+        </MudStack>
             <MudDivider Class="my-2" />
             <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
             <MudNavGroup Title="Products" Expanded="true">
@@ -35,6 +54,9 @@
 {
     private List<ProductDTO> products = new List<ProductDTO>();
     private List<string> categories = new List<string>();
+    private string SearchQuery { get; set; } = string.Empty;
+    private List<ProductDTO> FilteredProducts { get; set; } = new();
+    private bool ShowSearchResults => FilteredProducts.Any();
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,4 +64,30 @@
         
         categories = products.Select(p => p.ProductCategory).Distinct().ToList();
     }
+
+    private void GoToProductPage(string productId)
+    {
+        Navigation.NavigateTo($"/product-page/{productId}");
+        SearchQuery = string.Empty;
+        FilteredProducts.Clear();
+        StateHasChanged();
+    }
+
+      private void FilterProducts(string query)
+   {
+        SearchQuery = query;
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredProducts.Clear();
+            return;
+        }
+
+        FilteredProducts = products
+            .Where(p => p.ProductName.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+            .Take(5)
+            .ToList();
+
+        StateHasChanged();
+   }
 }
