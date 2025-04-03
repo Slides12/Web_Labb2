@@ -70,6 +70,7 @@ namespace Web_Labb2.Controllers
         }
 
         [HttpPost("upload-image")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -93,6 +94,7 @@ namespace Web_Labb2.Controllers
 
         // PUT api/<ProductController>/5
         [HttpPut("update/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> PutAllInfo(string id, [FromBody] ProductDTO updatedProduct)
         {
             Console.WriteLine($"Received PUT request for product ID: {updatedProduct.ProductId}");
