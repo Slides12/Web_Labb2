@@ -54,7 +54,7 @@
             success = true;
             await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
             await ((CustomAuthStateProvider)AuthStateProvider).StoreUserEmail(res.Email);
-            Navigation.NavigateTo("/dashboard");
+            Navigation.NavigateTo("/user");
         }
     }
 

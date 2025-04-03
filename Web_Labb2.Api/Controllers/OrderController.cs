@@ -56,6 +56,7 @@ namespace Web_Labb2.Api.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOrder([FromBody] OrderDTO value)
         {
+            Console.WriteLine(value.OrderDetails[0].ProductName);
             if (value == null || value.CustomerID == 0 || value.OrderDetails == null || value.OrderDetails.Count == 0)
             {
                 return BadRequest("Invalid order data. CustomerID and OrderDetails are required.");

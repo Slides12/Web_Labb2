@@ -79,7 +79,7 @@
             if (!string.IsNullOrEmpty(product.ProductId) || string.IsNullOrEmpty(product.ProductName))
             {
                 await APIClient.PostAsync<string, ProductDTO>("https://localhost:7218/api/Product", product);
-                Snackbar.Add($"{product.ProductName} added.", Severity.Success);
+
 
                 success = true;
             }
@@ -87,8 +87,11 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+
             success = false;
         }
+        Snackbar.Add($"{product.ProductName} added.", Severity.Success);
+
         StateHasChanged();
     }
 
@@ -104,6 +107,8 @@
             {
                 product.ImagePath = imagePath; // Use the full URL now!
                 Console.WriteLine($"UploadFiles2: Image URL stored -> {product.ImagePath}");
+                Snackbar.Add($"Image is successfully uploaded", Severity.Success);
+
             }
             else
             {
@@ -113,6 +118,8 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error uploading image: {ex.Message}");
+            Snackbar.Add($"Something went wrong with the image.", Severity.Success);
+
         }
     }
 

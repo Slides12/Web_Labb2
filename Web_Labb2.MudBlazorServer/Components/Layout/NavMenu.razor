@@ -9,7 +9,7 @@
                 <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">All your pc stuff in one place.</MudText>
             </a>
             <MudStack>
-            <MudTextField Label="Search..." Variant="Variant.Outlined" Adornment="Adornment.Start"
+            <MudTextField Label="Search" Variant="Variant.Outlined" Adornment="Adornment.Start"
             AdornmentIcon="@Icons.Material.Filled.Search" Value="@SearchQuery"
             ValueChanged="@( (string v) => FilterProducts(v) )" Immediate="true" />
 
@@ -27,7 +27,7 @@
             </MudPopover>
         </MudStack>
             <MudDivider Class="my-2" />
-            <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
+            @* <MudNavLink Href="/dashboard">Dashboard</MudNavLink> *@
             <MudNavGroup Title="Products" Expanded="true">
                 <MudNavLink Href="all-products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LaptopChromebook">All products</MudNavLink>
                 @foreach(var category in categories)

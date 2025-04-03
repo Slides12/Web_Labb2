@@ -2,28 +2,35 @@
 @inject APIClient APIClient
 @inject AuthenticationStateProvider AuthStateProvider
 
-<h3>User</h3>
+<h3>@userRole</h3>
 
 <MudList T="OrderDTO">
     @foreach (var order in orders)
     {
         <MudListItem>
-            <MudText><b>Order ID:</b> @order.OrderID</MudText>
-            <MudText><b>Customer ID:</b> @customer.Id</MudText>
-            <MudText><b>First Name:</b> @customer.FirstName</MudText>
-            <MudText><b>Last Name:</b> @customer.LastName</MudText>
-
+            <MudButton @onclick="ExpandItem">
+                    <MudStack Spacing="3" Row="true">
+                    <MudText><b>Order ID:</b> @order.OrderID</MudText>
+                    <MudText><b>Customer ID:</b> @customer.Id</MudText>
+                    <MudText><b>First Name:</b> @customer.FirstName</MudText>
+                    <MudText><b>Last Name:</b> @customer.LastName</MudText>
+                    <MudText><b>Total sum:</b> @order.TotalAmount</MudText>
+                </MudStack>
+            </MudButton>
             <!-- Order Details -->
             @if (order.OrderDetails != null && order.OrderDetails.Any())
             {
                 <MudList T="OrderDetailDTO">
                     @foreach (var od in order.OrderDetails)
                     {
-                        <MudListItem>
-                            <MudText><b>Product ID:</b> @od.ProductID</MudText>
-                            <MudText><b>Quantity:</b> @od.Quantity</MudText>
-                            <MudText><b>Price:</b> @od.Price</MudText>
-                        </MudListItem>
+                        <MudCollapse Expanded="_expand">
+                            <MudListItem>
+                                <MudText><b>Product Name:</b> @od.ProductName</MudText>
+                                <MudText><b>Product ID:</b> @od.ProductID</MudText>
+                                <MudText><b>Quantity:</b> @od.Quantity</MudText>
+                                <MudText><b>Price:</b> @od.Price</MudText>
+                            </MudListItem>
+                        </MudCollapse>
                     }
                 </MudList>
             }
@@ -37,12 +44,22 @@
 
 @code {
     private int customerId;
+    private string userRole = "Unknown";
+    private bool _expand = false;
     private List<OrderDTO> orders = new List<OrderDTO>();
     private CustomerDTO customer = new CustomerDTO() { FirstName="", LastName=""};
 
     protected override async Task OnInitializedAsync()
     {
         var email = await ((CustomAuthStateProvider)AuthStateProvider).GetStoredUserEmail();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No Role Assigned";
+        }
 
         if (string.IsNullOrEmpty(email))
         {
@@ -52,7 +69,7 @@
 
         try
         {
-             customer = await APIClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{email}");
+            customer = await APIClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{email}");
 
             if (customer == null)
             {
@@ -63,6 +80,7 @@
             customerId = customer.Id;
             orders = await APIClient.GetFromJsonAsync<List<OrderDTO>>($"https://localhost:7218/api/Order/orders/{customerId}");
 
+
             if (orders == null || orders.Count == 0)
             {
                 Console.WriteLine("No orders found for this customer.");
@@ -72,5 +90,10 @@
         {
             Console.WriteLine($"API Error: {ex.Message}");
         }
+    }
+
+    public void ExpandItem()
+    {
+        _expand = !_expand;
     }
 }

@@ -58,7 +58,7 @@ namespace Web_Labb2.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet("get-user/{username}")]
-        public async Task<ActionResult<ProductDTO>> GetProductByName(string username)
+        public async Task<ActionResult<ProductDTO>> GetUserByName(string username)
         {
             var result = await _authService.GetUserByUsername(username);
             if (result == null)

@@ -6,6 +6,7 @@ namespace Web_Labb2.Shared.DTO_s
     public class OrderDetailDTO
     {
         public int OrderDetailID { get; set; }
+        public string ProductName { get; set; }
         public string ProductID { get; set; }
         public int Quantity { get; set; }
 

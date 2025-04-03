@@ -29,6 +29,7 @@ namespace Web_Labb2.Api.Services
                 TotalAmount = order.TotalAmount,
                 OrderDetails = order.OrderDetails.Select(od => new OrderDetail
                 {
+                    ProductName = od.ProductName,
                     ProductID = od.ProductID,
                     Quantity = od.Quantity,
                     Price = od.Price
@@ -83,6 +84,7 @@ namespace Web_Labb2.Api.Services
                 TotalAmount = o.TotalAmount,
                 OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
                 {
+                    ProductName = od.ProductName,
                     OrderDetailID = od.OrderDetailID,
                     ProductID = od.ProductID,
                     Quantity = od.Quantity,
@@ -124,6 +126,7 @@ namespace Web_Labb2.Api.Services
             existingOrder.TotalAmount = order.TotalAmount;
             existingOrder.OrderDetails = order.OrderDetails.Select(od => new OrderDetail
             {
+                ProductName = od.ProductName,
                 ProductID = od.ProductID,
                 Quantity = od.Quantity,
                 Price = od.Price
@@ -140,6 +143,7 @@ namespace Web_Labb2.Api.Services
                 TotalAmount = existingOrder.TotalAmount,
                 OrderDetails = existingOrder.OrderDetails.Select(od => new OrderDetailDTO
                 {
+                    ProductName = od.ProductName,
                     ProductID = od.ProductID,
                     Quantity = od.Quantity,
                     Price = od.Price

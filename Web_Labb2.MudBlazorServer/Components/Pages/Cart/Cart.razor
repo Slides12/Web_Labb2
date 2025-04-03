@@ -21,11 +21,7 @@
 </MudContainer>
 
 @code {
-    private async Task RemoveFromCart(ProductDTO product)
-    {
-        CartService.CartItems.Remove(product);
-        await CartService.AddToCart(null); // Update local storage
-    }
+    
 
     private async Task ClearCart()
     {

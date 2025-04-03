@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 
 
 <PageTitle>Users</PageTitle>
@@ -16,32 +17,55 @@
 }
 else
 {
-    <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<UpdateUserDTO, object>(x=>x.Username)">Username</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Role)">Role</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Username">@context.Username</MudTd>
-            <MudTd DataLabel="Role">@context.Role</MudTd>
-            <MudTd DataLabel="Email">@context.Email</MudTd>
-            @if (isAdmin)
-            {
-                <MudTd><MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@((e) => UpdateUser(context))">Update</MudButton></MudTd>
-                <MudTd><MudButton @onclick="() => DeleteUser(context.Username)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton></MudTd>
-            }
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
-        </PagerContent>
-    </MudTable>
+    <MudStack>
+        <MudTextField Label="Search" Variant="Variant.Outlined" Adornment="Adornment.Start"
+        AdornmentIcon="@Icons.Material.Filled.Search" Value="@SearchQuery"
+        ValueChanged="@( (string v) => FilterProducts(v) )" Immediate="true" />
+
+        <MudPopover Open="@ShowSearchResults" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopCenter">
+            <MudPaper Class="pa-2" Elevation="4" Width="300px">
+                <MudList T="UpdateUserDTO">
+                    @foreach (var user in FilteredUsers)
+                    {
+                        <MudListItem Button="true" OnClick="() => GoToUserPage(user.Email)">
+                            @user.Email
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+        </MudPopover>
+        <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<UpdateUserDTO, object>(x=>x.Username)">Username</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Role)">Role</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Username">@context.Username</MudTd>
+                <MudTd DataLabel="Role">@context.Role</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                @if (isAdmin)
+                {
+                    <MudTd><MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@((e) => UpdateUser(context))">Update</MudButton></MudTd>
+                    <MudTd><MudButton @onclick="() => DeleteUser(context.Username)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton></MudTd>
+                }
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+            </PagerContent>
+        </MudTable>
+    </MudStack>
 }
 
 @code {
 
     private List<UpdateUserDTO> users = new List<UpdateUserDTO>();
     private bool isAdmin;
+    private string SearchQuery { get; set; } = string.Empty;
+    private List<UpdateUserDTO> FilteredUsers { get; set; } = new();
+    private bool ShowSearchResults => FilteredUsers.Any();
+
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -49,6 +73,34 @@ else
 
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         isAdmin = authState.User.IsInRole("Admin");
+        StateHasChanged();
+    }
+
+
+    private async Task GoToUserPage(string email)
+    {
+        var getUser = users.Where(u => u.Email.Equals(email)).ToList();
+        var user = await APIClient.GetFromJsonAsync<UpdateUserDTO>($"https://localhost:7218/api/Auth/get-user/{getUser[0].Username}");
+        await UpdateUser(user);
+        SearchQuery = string.Empty;
+        StateHasChanged();
+    }
+
+    private void FilterProducts(string query)
+    {
+        SearchQuery = query;
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredUsers.Clear();
+            return;
+        }
+
+        FilteredUsers = users
+            .Where(u => u.Email.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+            .Take(1)
+            .ToList();
+
         StateHasChanged();
     }
 

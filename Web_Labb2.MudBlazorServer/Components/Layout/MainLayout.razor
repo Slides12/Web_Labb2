@@ -14,7 +14,7 @@
         <a Href="/" Match="NavLinkMatch.All" Class="d-flex align-center">
             <MudImage Width="130" Height="100" Src="D-inet.png"></MudImage>
         </a>
-        
+
 
 
         <MudSpacer />
@@ -67,6 +67,8 @@
                 </MudStack>
             </MudStack>
         </MudDrawerHeader>
+        <MudButton Color="Color.Success" OnClick="ClearCart">Clear Cart</MudButton>
+        <MudButton Color="Color.Success" OnClick="Checkout">Checkout</MudButton>
         <MudList T="ProductDTO">
             @foreach(var product in CartService.CartItems)
             {
@@ -104,7 +106,7 @@
     private bool _open = false;
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
-  
+
 
 
     protected async override Task OnInitializedAsync()
@@ -120,6 +122,18 @@
             LayoutProperties = new LayoutProperties()
         };
         CartService.LoadCart();
+    }
+
+
+    private async Task ClearCart()
+    {
+        await CartService.ClearCart();
+    }
+
+    private async Task Checkout()
+    {
+        _open = false;
+        Navigation.NavigateTo("/checkout");
     }
 
     private void GoToCart()
