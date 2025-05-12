@@ -1,0 +1,66 @@
+﻿@using MudBlazor
+@using Web_Labb2.Shared.DTO_s
+@inject APIClient APIClient
+
+<MudDialog MaxWidth="MaxWidth.Medium" FullWidth="true">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Orders for @User?.Username</MudText>
+
+        @if (Orders == null)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (!Orders.Any())
+        {
+            <MudText>No orders found.</MudText>
+        }
+        else
+        {
+            <MudExpansionPanels>
+                @foreach (var order in Orders)
+                {
+                    <MudExpansionPanel Text="@($"Order #{order.OrderID} — {order.OrderDate:d} — Total: {order.TotalAmount} kr")">
+                        <MudTable Items="order.OrderDetails" Dense="true" Elevation="0" Hover="false">
+                            <HeaderContent>
+                                <MudTh>Product</MudTh>
+                                <MudTh align="right">Qty</MudTh>
+                                <MudTh align="right">Unit Price</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.ProductName</MudTd>
+                                <MudTd align="right">@context.Quantity</MudTd>
+                                <MudTd align="right">@context.Price kr</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudExpansionPanel>
+                }
+            </MudExpansionPanels>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public string Username { get; set; } = default!;
+
+    private UserDTO? User;
+    private List<OrderDTO>? Orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = await APIClient
+          .GetFromJsonAsync<UserDTO>($"https://localhost:7218/api/Auth/get-user/{Username}");
+
+        if (User?.CustomerId > 0)
+        {
+            Orders = await APIClient
+              .GetFromJsonAsync<List<OrderDTO>>($"https://localhost:7218/api/Order/orders/{User.CustomerId}");
+        }
+    }
+
+    void Close() => MudDialog.Close();
+}

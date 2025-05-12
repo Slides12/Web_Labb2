@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Web_Labb2.Shared.Models;
 
 public class CustomerEntity
@@ -8,5 +9,8 @@ public class CustomerEntity
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public AddressEntity? AddressInformation { get; set; }
-    public List<OrderInfo> Orders { get; set; }
+    [JsonIgnore]
+    public User User { get; set; } = null!;
+
+    public List<OrderInfo> Orders { get; set; } = new();
 }

@@ -41,10 +41,19 @@ namespace Web_Labb2.Api.Services
 
             return new OrderDTO
             {
+                OrderID = createdOrder.OrderID,
                 CustomerID = createdOrder.CustomerID,
                 OrderDate = createdOrder.OrderDate,
                 TotalAmount = createdOrder.TotalAmount,
+                OrderDetails = createdOrder.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    ProductName = od.ProductName,
+                    ProductID = od.ProductID,
+                    Quantity = od.Quantity,
+                    Price = od.Price
+                }).ToList()
             };
+
         }
 
 

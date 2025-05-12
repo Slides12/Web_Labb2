@@ -1,0 +1,113 @@
+﻿@using MudBlazor
+@using Web_Labb2.Shared.DTO_s
+@inject APIClient APIClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" GutterBottom>Edit Customer</MudText>
+        <EditForm Model="@Editable" OnValidSubmit="HandleSave">
+            <DataAnnotationsValidator />
+
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="First Name"
+                    @bind-Value="Editable.FirstName"
+                    Required="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Last Name"
+                    @bind-Value="Editable.LastName"
+                    Required="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Email"
+                    @bind-Value="Editable.Email"
+                    Disabled="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Phone"
+                    @bind-Value="Editable.PhoneNumber" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-4" />
+
+            <MudText Typo="Typo.subtitle1">Address</MudText>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Street"
+                    @bind-Value="Editable.AddressInformation.Address" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField Label="Post Code"
+                    @bind-Value="Editable.AddressInformation.PostNumber" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField Label="City"
+                    @bind-Value="Editable.AddressInformation.City" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Country"
+                    @bind-Value="Editable.AddressInformation.Country" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDialogActions>
+                <MudButton ButtonType="ButtonType.Submit"
+                Variant="Variant.Filled"
+                Color="Color.Primary">
+                    Save
+                </MudButton>
+                <MudButton OnClick="Cancel"
+                Variant="Variant.Text"
+                Color="Color.Secondary">
+                    Cancel
+                </MudButton>
+            </MudDialogActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter]         public CustomerDTO Customer { get; set; } = default!;
+
+    private CustomerDTO Editable = new() { FirstName = "", LastName = "" };
+
+  protected override void OnInitialized()
+  {
+    Editable = new CustomerDTO {
+      Id                = Customer.Id,
+      FirstName         = Customer.FirstName,
+      LastName          = Customer.LastName,
+      Email             = Customer.Email,
+      PhoneNumber       = Customer.PhoneNumber,
+      AddressInformation = new AddressDTO {
+        Address    = Customer.AddressInformation?.Address,
+        PostNumber = Customer.AddressInformation?.PostNumber,
+        City       = Customer.AddressInformation?.City,
+        Country    = Customer.AddressInformation?.Country
+      }
+    };
+  }
+
+  private async Task HandleSave()
+  {
+    try
+    {
+      var updated = await APIClient.PutAsync<CustomerDTO,CustomerDTO>(
+        $"https://localhost:7218/api/Customer/{Uri.EscapeDataString(Editable.Email)}",
+        Editable);
+
+      Snackbar.Add("Customer saved", Severity.Success);
+      MudDialog.Close(DialogResult.Ok(updated));
+    }
+    catch (Exception e)
+    {
+      Snackbar.Add("Error saving: " + e.Message, Severity.Error);
+    }
+  }
+
+  void Cancel() => MudDialog.Cancel();
+}

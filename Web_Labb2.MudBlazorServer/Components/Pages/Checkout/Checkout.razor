@@ -1,208 +1,169 @@
 ﻿@page "/checkout"
 @inject ISnackbar Snackbar
-@inject APIClient ApiClient;
-@inject CartService CartService;
+@inject APIClient ApiClient
+@inject CartService CartService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 
 <h3>Checkout</h3>
 
 <EditForm Model="@customer" OnValidSubmit="SubmitCustomerAndOrder">
     <DataAnnotationsValidator />
-    <MudStack Row=true>
+    <MudStack Row="true">
         <MudGrid>
             <MudItem xs="12" sm="6">
                 <MudCard>
                     <MudCardContent>
                         <MudText Typo="Typo.h6">Customer Information</MudText>
-                        <MudTextField Label="First Name" HelperText="Enter your first name"
-                        @bind-Value="customer.FirstName" For="@(() => customer.FirstName)" />
-                        <MudTextField Label="Last Name" HelperText="Enter your last name"
-                        @bind-Value="customer.LastName" For="@(() => customer.LastName)" />
-                        <MudTextField Label="Email" HelperText="Enter your email address"
-                        @bind-Value="customer.Email" For="@(() => customer.Email)" />
-                        <MudTextField Label="Phone Number" HelperText="Enter your phone number"
-                        @bind-Value="customer.PhoneNumber" For="@(() => customer.PhoneNumber)" />
+                        <MudTextField Label="First Name" @bind-Value="customer.FirstName" />
+                        <MudTextField Label="Last Name" @bind-Value="customer.LastName" />
+                        <MudTextField Label="Phone Number" @bind-Value="customer.PhoneNumber" />
                     </MudCardContent>
                 </MudCard>
             </MudItem>
-
             <MudItem xs="12" sm="6">
                 <MudCard>
                     <MudCardContent>
                         <MudText Typo="Typo.h6">Address Information</MudText>
-                        <MudTextField Label="Address" HelperText="Enter your address"
-                        @bind-Value="customer.AddressInformation.Address" For="@(() => customer.AddressInformation.Address)" />
-                        <MudTextField Label="Post Number" HelperText="Enter your post number"
-                        @bind-Value="customer.AddressInformation.PostNumber" For="@(() => customer.AddressInformation.PostNumber)" />
-                        <MudTextField Label="City" HelperText="Enter your city"
-                        @bind-Value="customer.AddressInformation.City" For="@(() => customer.AddressInformation.City)" />
-                        <MudTextField Label="Country" HelperText="Enter your country"
-                        @bind-Value="customer.AddressInformation.Country" For="@(() => customer.AddressInformation.Country)" />
+                        <MudTextField Label="Address" @bind-Value="customer.AddressInformation.Address" />
+                        <MudTextField Label="Post Number" @bind-Value="customer.AddressInformation.PostNumber" />
+                        <MudTextField Label="City" @bind-Value="customer.AddressInformation.City" />
+                        <MudTextField Label="Country" @bind-Value="customer.AddressInformation.Country" />
                     </MudCardContent>
                 </MudCard>
             </MudItem>
-
-
         </MudGrid>
-
         <MudGrid>
             <MudItem xs="12" sm="6">
                 <MudCard>
                     <MudCardContent>
                         <MudText Typo="Typo.h6">Order Information</MudText>
-                        <MudTextField Label="Order Date" HelperText="Date of order" Type="date" Disabled
-                        @bind-Value="order.OrderDate" For="@(() => order.OrderDate)" />
-                        <MudTextField Label="Total Amount" HelperText="Total amount in kr." Disabled
-                        @bind-Value="order.TotalAmount" For="@(() => order.TotalAmount)" />
+                        <MudTextField Label="Order Date" Disabled @bind-Value="order.OrderDate" />
+                        <MudTextField Label="Total Amount" Disabled @bind-Value="order.TotalAmount" />
                     </MudCardContent>
                 </MudCard>
             </MudItem>
-
             <MudItem xs="12">
-                <MudPaper Class="pa-4 mud-height-full">
+                <MudPaper Class="pa-4">
                     <MudText Typo="Typo.subtitle2">Order Summary</MudText>
-                    <MudList T="OrderDTO">
+                    <MudList T="OrderDetailDTO">
                         @foreach (var item in order.OrderDetails)
                         {
-                            <MudListItem>
-                                <MudText>Product Name: @item.ProductName</MudText>
-                                <MudText>Product ID: @item.ProductID</MudText>
-                                <MudText>Quantity: @item.Quantity</MudText>
+                            <MudListItem T="OrderDetailDTO">
+                                <MudText>Product: @item.ProductName</MudText>
+                                <MudText>ID: @item.ProductID</MudText>
+                                <MudText>Qty: @item.Quantity</MudText>
                                 <MudText>Price: @item.Price</MudText>
                             </MudListItem>
                         }
                     </MudList>
                 </MudPaper>
             </MudItem>
-
             <MudItem xs="12">
-                <MudButton Disabled="@empty" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit Order</MudButton>
+                <MudButton Disabled="@empty"
+                           ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Class="ml-auto">
+                    Submit Order
+                </MudButton>
             </MudItem>
         </MudGrid>
-
     </MudStack>
-
 </EditForm>
 
 <MudSnackbarProvider />
 
 @code {
-    private CustomerDTO customer = new CustomerDTO() { FirstName="", LastName=""};
-
-    private OrderDTO order = new OrderDTO();
+    private CustomerDTO customer = new()
+        {
+            FirstName = "",
+            LastName = "",
+            Email = "",
+            PhoneNumber = "",
+            AddressInformation = new AddressDTO()
+        };
+    private OrderDTO order = new();
     private bool empty = false;
+    private string username = "";
 
     protected override async Task OnInitializedAsync()
     {
-        customer = new CustomerDTO()
-            {
-                FirstName = "",
-                LastName = "",
-                AddressInformation = new AddressDTO()
-                {
-                    Address = "",
-                    City = "",
-                    Country = "",
-                    PostNumber = ""
-                }
-            };
+        await CartService.LoadCart();
 
         order = new OrderDTO
             {
                 OrderDate = DateTime.Now,
-                OrderDetails = new List<OrderDetailDTO>(),
-                Customer = customer
+                OrderDetails = CartService.CartItems.Select(p => new OrderDetailDTO
+                {
+                    ProductName = p.ProductName,
+                    ProductID = p.ProductId,
+                    Quantity = 1,
+                    Price = p.Price
+                }).ToList()
             };
 
-        await CartService.LoadCart();
+        empty = !order.OrderDetails.Any();
+        order.TotalAmount = order.OrderDetails.Sum(i => i.Price * i.Quantity);
 
-        order.OrderDetails = CartService.CartItems.Select(p => new OrderDetailDTO
-            {
-                ProductName = p.ProductName,
-                ProductID = p.ProductId,
-                Quantity = 1,
-                Price = p.Price
-            }).ToList();
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        username = auth.User.Identity?.Name ?? "";
 
-        empty = order.OrderDetails.Count == 0;
-        order.TotalAmount = order.OrderDetails.Sum(d => d.Price * d.Quantity);
+        var userDto = await ApiClient.GetFromJsonAsync<UserDTO>(
+            $"https://localhost:7218/api/Auth/get-user/{Uri.EscapeDataString(username)}");
+
+        CustomerDTO existing = null;
+        try
+        {
+            existing = await ApiClient.GetFromJsonAsync<CustomerDTO>(
+                $"https://localhost:7218/api/Customer/{Uri.EscapeDataString(userDto.Email)}");
+        }
+        catch { }
+
+        if (existing == null)
+        {
+            customer.Email = userDto.Email;
+            customer.FirstName = userDto.Username;
+            var created = await ApiClient.PostAsync<CustomerDTO, CustomerDTO>(
+                "https://localhost:7218/api/Customer",
+                customer);
+            customer = created ?? customer;
+        }
+        else
+        {
+            customer = existing;
+        }
     }
-
 
     private async Task SubmitCustomerAndOrder()
     {
-
-
         try
         {
-
-            var existingCustomer = await ApiClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{customer.Email}");
-
-            if (existingCustomer != null)
-            {
-
-                order.CustomerID = existingCustomer.Id;
-                order.Customer = existingCustomer;
-
-                if (order.OrderDetails == null || !order.OrderDetails.Any())
-                {
-                    Console.WriteLine("Error: Order details are missing.");
-                    Snackbar.Add($"Error: Order details are missing.", Severity.Error);
-
-                    return;
-                }
-
-                var orderResponse = await ApiClient.PostAsync<OrderDTO, OrderDTO>("https://localhost:7218/api/Order", order);
-
-                if (orderResponse != null)
-                {
-                    await CartService.ClearCart();
-                    Snackbar.Add($"Order submitted successfully: { orderResponse.OrderID}" , Severity.Success);
-                    Console.WriteLine("Order submitted successfully! ");
-                    Navigation.NavigateTo("/");
-                }
-                else
-                {
-                    Snackbar.Add($"Failed to submit order.", Severity.Error);
-
-                    Console.WriteLine("Failed to submit order.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Customer does not exist. Creating new customer...");
-
-                var customerResponse = await ApiClient.PostAsync<CustomerDTO, CustomerDTO>("https://localhost:7218/api/Customer", customer);
-
-                if (customerResponse != null)
-                {
-                    Console.WriteLine("Customer created with ID: " + customerResponse.Id);
-
-                    order.CustomerID = customerResponse.Id;
-                    order.Customer = customer;
-
-                    if (order.OrderDetails == null || !order.OrderDetails.Any())
-                    {
-                        Console.WriteLine("Error: Order details are missing.");
-                        return;
-                    }
-
-                    Console.WriteLine("Submitting order...");
-                    var orderResponse = await ApiClient.PostAsync<OrderDTO, OrderDTO>("https://localhost:7218/api/Order", order);
-
-                    if (orderResponse != null)
-                    {
-                        await CartService.ClearCart();
-                        Console.WriteLine("Order submitted successfully: " + orderResponse.OrderID);
-                    }
-                }
-                
-            }
+            await ApiClient.PutAsync<string, CustomerDTO>(
+                $"https://localhost:7218/api/Customer/{Uri.EscapeDataString(customer.Email)}",
+                customer);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine("Error submitting customer and order: " + ex.Message);
+            Snackbar.Add("Failed to save your address", Severity.Error);
+        }
+
+        order.CustomerID = customer.Id;
+        order.Customer = customer;
+
+        var response = await ApiClient.PostAsync<OrderDTO, OrderDTO>(
+            "https://localhost:7218/api/Order",
+            order);
+
+        if (response != null)
+        {
+            await CartService.ClearCart();
+            Snackbar.Add($"Order #{response.OrderID} submitted!", Severity.Success);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Snackbar.Add("Order submission failed", Severity.Error);
         }
     }
-
 }

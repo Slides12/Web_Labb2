@@ -82,24 +82,21 @@ namespace Web_Labb2.Controllers
 
 
         [HttpPut("{email}")]
-        public async Task<ActionResult> UpdateCustomerByEmail(string email, [FromBody] CustomerDTO updatedCustomer)
+        public async Task<ActionResult<CustomerDTO>> UpdateCustomerByEmail(string email, [FromBody] CustomerDTO updatedCustomer)
         {
             if (string.IsNullOrEmpty(email))
-            {
-                return NotFound("No user with that email exist.");
-            }
-            else if (string.IsNullOrEmpty(updatedCustomer.FirstName) || string.IsNullOrEmpty(updatedCustomer.LastName) || string.IsNullOrEmpty(updatedCustomer.Email))
-            {
-                return BadRequest("You need to add updated information.");
-            }
+                return NotFound("No user with that email exists.");
 
-            var result = await _customerService.UpdateCustomerByEmail(email, updatedCustomer);
-            if (!result)
-            {
+
+            var ok = await _customerService.UpdateCustomerByEmail(email, updatedCustomer);
+            if (!ok)
                 return NotFound("Customer not found or update failed.");
-            }
 
-            return Ok("Customer is updated successfully.");
+            var result = await _customerService.GetCustomerByEmail(email);
+            return Ok(result);
         }
+
+
+
     }
 }

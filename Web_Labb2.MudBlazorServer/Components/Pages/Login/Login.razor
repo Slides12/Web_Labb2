@@ -48,13 +48,26 @@
 
     private async Task HandleLogin()
     {
-        var res = await APIClient.PostAsync<AuthResult, LoginDTO>("https://localhost:7218/api/Auth/login", loginModel);
-        if(res != null && res.Token != null)
+        try
         {
-            success = true;
-            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
-            await ((CustomAuthStateProvider)AuthStateProvider).StoreUserEmail(res.Email);
-            Navigation.NavigateTo("/user");
+            var res = await APIClient.PostAsync<AuthResult, LoginDTO>("https://localhost:7218/api/Auth/login", loginModel);
+                if(res != null && res.Token != null)
+                {
+                    success = true;
+                    await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res.Token);
+                    await ((CustomAuthStateProvider)AuthStateProvider).StoreUserEmail(res.Email);
+                    Navigation.NavigateTo("/user");
+                }
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            Console.WriteLine(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            success = false;
+            Console.WriteLine(ex.Message);
         }
     }
 

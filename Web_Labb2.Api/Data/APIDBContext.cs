@@ -23,6 +23,13 @@ public class APIDBContext : DbContext
             .HasOne(od => od.Product)
             .WithMany()
             .HasForeignKey(od => od.ProductID);
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Customer)
+            .WithOne(c => c.User)
+            .HasForeignKey<User>(u => u.CustomerId)
+            .IsRequired();
+
     }
 
 }

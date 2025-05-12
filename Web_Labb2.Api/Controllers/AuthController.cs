@@ -55,18 +55,28 @@ namespace Web_Labb2.Api.Controllers
             return Ok(user);
         }
 
-
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("get-user/{username}")]
-        public async Task<ActionResult<ProductDTO>> GetUserByName(string username)
+        public async Task<ActionResult<UserDTO>> GetUserByName(string username)
         {
-            var result = await _authService.GetUserByUsername(username);
-            if (result == null)
+            var current = User.Identity?.Name;
+
+            if (!User.IsInRole("Admin") &&
+                !string.Equals(current, username, StringComparison.OrdinalIgnoreCase))
             {
-                return NotFound("There is no user by this name.");
+                return Forbid();
             }
-            return Ok(result);
+
+            var dto = await _authService.GetUserByUsername(username);
+            if (dto == null)
+                return NotFound("User not found.");
+
+            return Ok(dto);
         }
+
+
+
+
 
         [Authorize(Roles = "Admin")]
         [HttpPut("update/{username}")]

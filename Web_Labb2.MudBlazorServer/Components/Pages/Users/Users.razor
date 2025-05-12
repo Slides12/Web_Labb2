@@ -1,112 +1,114 @@
 ﻿@page "/users"
+@using MudBlazor
+@using Web_Labb2.Shared.DTO_s
 @inject APIClient APIClient
 @inject AuthenticationStateProvider AuthProvider
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-@inject NavigationManager Navigation
-
 
 <PageTitle>Users</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">-Admin-</MudText>
-<MudText Typo="Typo.body1" Class="mb-8">Edit users.</MudText>
+<MudText Typo="Typo.h3" GutterBottom>- Admin -</MudText>
 
-@if (users == null)
+@if (users is null)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Indeterminate="true" />
 }
 else
 {
-    <MudStack>
-        <MudTextField Label="Search" Variant="Variant.Outlined" Adornment="Adornment.Start"
-        AdornmentIcon="@Icons.Material.Filled.Search" Value="@SearchQuery"
-        ValueChanged="@( (string v) => FilterProducts(v) )" Immediate="true" />
+    <MudTable Items="users" Hover="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Username</MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Username</MudTd>
+            <MudTd>@context.Role</MudTd>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           OnClick="() => UpdateUser(context)">
+                    Update Account
+                </MudButton>
 
-        <MudPopover Open="@ShowSearchResults" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopCenter">
-            <MudPaper Class="pa-2" Elevation="4" Width="300px">
-                <MudList T="UpdateUserDTO">
-                    @foreach (var user in FilteredUsers)
-                    {
-                        <MudListItem Button="true" OnClick="() => GoToUserPage(user.Email)">
-                            @user.Email
-                        </MudListItem>
-                    }
-                </MudList>
-            </MudPaper>
-        </MudPopover>
-        <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
-            <HeaderContent>
-                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<UpdateUserDTO, object>(x=>x.Username)">Username</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Role)">Role</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<UpdateUserDTO, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Username">@context.Username</MudTd>
-                <MudTd DataLabel="Role">@context.Role</MudTd>
-                <MudTd DataLabel="Email">@context.Email</MudTd>
-                @if (isAdmin)
-                {
-                    <MudTd><MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@((e) => UpdateUser(context))">Update</MudButton></MudTd>
-                    <MudTd><MudButton @onclick="() => DeleteUser(context.Username)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton></MudTd>
-                }
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[]{50, 100}" />
-            </PagerContent>
-        </MudTable>
-    </MudStack>
+                <MudButton Size="Size.Small"
+                           Variant="Variant.Text"
+                           Color="Color.Info"
+                           OnClick="() => ShowCustomerProfile(context.Email)">
+                    Edit Profile
+                </MudButton>
+
+                <MudButton Size="Size.Small"
+                           Variant="Variant.Text"
+                           Color="Color.Secondary"
+                           OnClick="() => ShowUserOrders(context.Username)">
+                    View Orders
+                </MudButton>
+
+                <MudButton Size="Size.Small"
+                           Variant="Variant.Text"
+                           Color="Color.Error"
+                           OnClick="() => DeleteUser(context.Username)">
+                    Delete
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{25,50,100}" />
+        </PagerContent>
+    </MudTable>
 }
 
 @code {
-
-    private List<UpdateUserDTO> users = new List<UpdateUserDTO>();
+    private List<UpdateUserDTO>? users;
     private bool isAdmin;
-    private string SearchQuery { get; set; } = string.Empty;
-    private List<UpdateUserDTO> FilteredUsers { get; set; } = new();
-    private bool ShowSearchResults => FilteredUsers.Any();
-
 
     protected override async Task OnInitializedAsync()
     {
-
-        users = await APIClient.GetFromJsonAsync<List<UpdateUserDTO>>("https://localhost:7218/api/Auth");
-
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        isAdmin = authState.User.IsInRole("Admin");
-        StateHasChanged();
+        var auth = await AuthProvider.GetAuthenticationStateAsync();
+        isAdmin = auth.User.IsInRole("Admin");
+        if (isAdmin)
+            users = await APIClient.GetFromJsonAsync<List<UpdateUserDTO>>(
+                "https://localhost:7218/api/Auth");
     }
 
-
-    private async Task GoToUserPage(string email)
+    async Task UpdateUser(UpdateUserDTO u)
     {
-        var getUser = users.Where(u => u.Email.Equals(email)).ToList();
-        var user = await APIClient.GetFromJsonAsync<UpdateUserDTO>($"https://localhost:7218/api/Auth/get-user/{getUser[0].Username}");
-        await UpdateUser(user);
-        SearchQuery = string.Empty;
-        StateHasChanged();
+        var p = new DialogParameters { { "user", u } };
+        await DialogService.ShowAsync<UpdateUserDialog>("Update Account", p);
     }
 
-    private void FilterProducts(string query)
+    async Task ShowCustomerProfile(string email)
     {
-        SearchQuery = query;
+        var cust = await APIClient.GetFromJsonAsync<CustomerDTO>(
+            $"https://localhost:7218/api/Customer/{Uri.EscapeDataString(email)}");
 
-        if (string.IsNullOrWhiteSpace(query))
+        var p = new DialogParameters { { "Customer", cust } };
+        var opts = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+        var reference = DialogService.Show<CustomerInfoDialog>("Edit Profile", p, opts);
+
+        var result = await reference.Result;
+        if (!result.Canceled && result.Data is CustomerDTO updated)
         {
-            FilteredUsers.Clear();
-            return;
+            Snackbar.Add($"Saved {updated.FirstName} {updated.LastName}", Severity.Success);
+            users = await APIClient.GetFromJsonAsync<List<UpdateUserDTO>>(
+                "https://localhost:7218/api/Auth");
+            StateHasChanged();
         }
-
-        FilteredUsers = users
-            .Where(u => u.Email.StartsWith(query, StringComparison.OrdinalIgnoreCase))
-            .Take(1)
-            .ToList();
-
-        StateHasChanged();
     }
 
+    void ShowUserOrders(string username)
+    {
+        var p = new DialogParameters { { "Username", username } };
+        var opts = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        DialogService.Show<UserOrdersDialog>("User Orders", p, opts);
+    }
 
-
-    public async Task DeleteUser(string username)
+    async Task DeleteUser(string username)
     {
         var parameters = new DialogParameters
         {
@@ -114,47 +116,25 @@ else
             { "ButtonText", "Delete" },
             { "Color", Color.Error }
         };
-
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Confirm Delete", parameters, options);
-        var result = await dialog.Result;
+        var dialogRef = DialogService.Show<DeleteUserDialog>("Confirm Delete", parameters, options);
+        var result = await dialogRef.Result;
 
-        if (!result.Canceled)
+        if (!result.Canceled && result.Data is bool ok && ok)
         {
-            try
+            var success = await APIClient.DeleteAsync($"https://localhost:7218/api/Auth/{username}");
+            if (success)
             {
-                bool deleteSuccess = await APIClient.DeleteAsync($"https://localhost:7218/api/Auth/{username}");
-
-                if (deleteSuccess)
-                {
-                    users = await APIClient.GetFromJsonAsync<List<UpdateUserDTO>>("https://localhost:7218/api/Auth");
-                    Snackbar.Add($"User deleted", Severity.Success);
-                    StateHasChanged();
-                }
+                Snackbar.Add("User deleted", Severity.Success);
+                users = await APIClient.GetFromJsonAsync<List<UpdateUserDTO>>(
+                    "https://localhost:7218/api/Auth");
+                StateHasChanged();
             }
-            catch (HttpRequestException ex)
+            else
             {
-                Snackbar.Add($"Error deleting product: {ex.Message}", Severity.Error);
+                Snackbar.Add("Failed to delete user", Severity.Error);
             }
         }
     }
-
-
-    public async Task UpdateUser(UpdateUserDTO updatedUser)
-    {
-        var parameters = new DialogParameters
-    {
-        { "user", updatedUser }
-    };
-
-
-        var dialog = await DialogService.ShowAsync<UpdateUserDialog>("Update User", parameters);
-        var result = await dialog.Result;
-
-
-    }
-
-
-
 }

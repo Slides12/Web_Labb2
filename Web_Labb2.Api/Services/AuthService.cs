@@ -78,26 +78,38 @@ namespace Web_Labb2.Api.Services
 
         public async Task<User?> RegisterAsync(UserDTO request)
         {
-            if (await _unitOfWork.Users.GetUserByUsernameAsync(request.Username) != null)
-            {
+            var existingUser = await _unitOfWork.Users.GetUserByUsernameAsync(request.Username);
+            if (existingUser != null)
                 return null;
-            }
 
-            var user = new User();
 
-            var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
+            var customer = new CustomerEntity
+            {
+                FirstName = "User",
+                LastName = request.Username,
+                Email = request.Email,
+                PhoneNumber = null,
+                AddressInformation = new AddressEntity()
+            };
 
-            user.Username = request.Username;
-            user.PasswordHash = hashedPassword;
-            user.Role = request.Role;
-            user.Email = request.Email;
+            await _unitOfWork.Customers.AddCustomerAsync(customer);
+            await _unitOfWork.SaveChangesAsync();
 
+            var user = new User
+            {
+                Username = request.Username,
+                Email = request.Email,
+                PasswordHash = new PasswordHasher<User>().HashPassword(null, request.Password),
+                Role = request.Role,
+                CustomerId = customer.Id
+            };
 
             await _unitOfWork.Users.AddUserAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
             return user;
         }
+
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
@@ -153,6 +165,7 @@ namespace Web_Labb2.Api.Services
                         Role = user.Role,
                         Email = user.Email,
                         Password = user.PasswordHash,
+                        CustomerId = user.CustomerId
                     };
                 }
                 return null;

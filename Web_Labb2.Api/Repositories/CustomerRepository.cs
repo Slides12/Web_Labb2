@@ -30,7 +30,7 @@ namespace Web_Labb2.Repositories
 
         public async Task<CustomerEntity> GetCustomerByEmailAsync(string email)
         {
-            return await _context.CustomerEntitys.FirstOrDefaultAsync(c => c.Email == email);
+            return await _context.CustomerEntitys.Include(c => c.AddressInformation).FirstOrDefaultAsync(c => c.Email == email);
         }
 
         public void DeleteCustomer(CustomerEntity deleteCustomer)

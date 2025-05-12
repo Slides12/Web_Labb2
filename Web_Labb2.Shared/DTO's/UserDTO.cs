@@ -24,6 +24,7 @@ namespace Web_Labb2.Shared.DTO_s
         [Required]
         [StringLength(30, ErrorMessage = "Email is required.", MinimumLength = 8)]
         public string Email { get; set; } = "";
+        public int CustomerId { get; set; }
     }
 
 }

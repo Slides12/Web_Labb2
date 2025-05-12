@@ -1,99 +1,116 @@
 ﻿@page "/user"
+@using System.Security.Claims
+@using Web_Labb2.Shared.DTO_s
+@using MudBlazor
 @inject APIClient APIClient
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<h3>@userRole</h3>
+<MudPaper Class="pa-6 mx-auto" Style="max-width:800px">
+  <MudText Typo="Typo.h4" GutterBottom>My Profile</MudText>
+  <MudButton Variant="Variant.Outlined"
+             Color="Color.Primary"
+             OnClick="EditProfile"
+             Class="mb-4">
+    Edit Profile
+  </MudButton>
 
-<MudList T="OrderDTO">
-    @foreach (var order in orders)
-    {
-        <MudListItem>
-            <MudButton @onclick="ExpandItem">
-                    <MudStack Spacing="3" Row="true">
-                    <MudText><b>Order ID:</b> @order.OrderID</MudText>
-                    <MudText><b>Customer ID:</b> @customer.Id</MudText>
-                    <MudText><b>First Name:</b> @customer.FirstName</MudText>
-                    <MudText><b>Last Name:</b> @customer.LastName</MudText>
-                    <MudText><b>Total sum:</b> @order.TotalAmount</MudText>
-                </MudStack>
-            </MudButton>
-            <!-- Order Details -->
-            @if (order.OrderDetails != null && order.OrderDetails.Any())
-            {
-                <MudList T="OrderDetailDTO">
-                    @foreach (var od in order.OrderDetails)
-                    {
-                        <MudCollapse Expanded="_expand">
-                            <MudListItem>
-                                <MudText><b>Product Name:</b> @od.ProductName</MudText>
-                                <MudText><b>Product ID:</b> @od.ProductID</MudText>
-                                <MudText><b>Quantity:</b> @od.Quantity</MudText>
-                                <MudText><b>Price:</b> @od.Price</MudText>
-                            </MudListItem>
-                        </MudCollapse>
-                    }
-                </MudList>
-            }
-            else
-            {
-                <MudText>No order details available.</MudText>
-            }
-        </MudListItem>
-    }
-</MudList>
+  @if (customer is null)
+  {
+    <MudProgressCircular Indeterminate="true" />
+  }
+  else
+  {
+    <MudGrid>
+      <MudItem xs="12" sm="6"><MudText><b>First Name:</b> @customer.FirstName</MudText></MudItem>
+      <MudItem xs="12" sm="6"><MudText><b>Last Name:</b>  @customer.LastName</MudText></MudItem>
+      <MudItem xs="12"><MudText><b>Email:</b>      @customer.Email</MudText></MudItem>
+      <MudItem xs="6"><MudText><b>Phone:</b>       @customer.PhoneNumber</MudText></MudItem>
+
+      <MudDivider Class="my-4" />
+
+      <MudItem xs="12"><MudText><b>Address:</b>    @customer.AddressInformation?.Address</MudText></MudItem>
+      <MudItem xs="4"><MudText><b>Post Code:</b>    @customer.AddressInformation?.PostNumber</MudText></MudItem>
+      <MudItem xs="4"><MudText><b>City:</b>         @customer.AddressInformation?.City</MudText></MudItem>
+      <MudItem xs="4"><MudText><b>Country:</b>      @customer.AddressInformation?.Country</MudText></MudItem>
+    </MudGrid>
+  }
+
+  <MudDivider Class="my-6" />
+
+  <MudText Typo="Typo.h5" GutterBottom>My Orders</MudText>
+  @if (orders is null)
+  {
+    <MudProgressCircular Indeterminate="true" />
+  }
+  else if (!orders.Any())
+  {
+    <MudText>No orders found.</MudText>
+  }
+  else
+  {
+    <MudExpansionPanels>
+      @foreach (var ord in orders)
+      {
+                <MudExpansionPanel Text="@($"Order #{ord.OrderID} — {ord.OrderDate:d} — Total: {ord.TotalAmount} kr")">
+          <MudTable Items="ord.OrderDetails" Dense="true" Elevation="0" Hover="false">
+            <HeaderContent>
+              <MudTh>Product</MudTh>
+              <MudTh align="right">Qty</MudTh>
+              <MudTh align="right">Unit Price</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+              <MudTd>@context.ProductName</MudTd>
+              <MudTd align="right">@context.Quantity</MudTd>
+              <MudTd align="right">@context.Price kr</MudTd>
+            </RowTemplate>
+          </MudTable>
+        </MudExpansionPanel>
+      }
+    </MudExpansionPanels>
+  }
+</MudPaper>
 
 @code {
-    private int customerId;
-    private string userRole = "Unknown";
-    private bool _expand = false;
-    private List<OrderDTO> orders = new List<OrderDTO>();
-    private CustomerDTO customer = new CustomerDTO() { FirstName="", LastName=""};
+  private CustomerDTO? customer;
+  private List<OrderDTO>?  orders;
 
-    protected override async Task OnInitializedAsync()
+  protected override async Task OnInitializedAsync()
+  {
+    var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+    var name = auth.User.FindFirst(ClaimTypes.Name)?.Value;
+    if (string.IsNullOrWhiteSpace(name)) return;
+
+    var userDto = await APIClient
+      .GetFromJsonAsync<UserDTO>($"https://localhost:7218/api/Auth/get-user/{name}");
+
+    customer = await APIClient
+      .GetFromJsonAsync<CustomerDTO>(
+        $"https://localhost:7218/api/Customer/{Uri.EscapeDataString(userDto.Email)}");
+
+    orders = await APIClient
+      .GetFromJsonAsync<List<OrderDTO>>(
+        $"https://localhost:7218/api/Order/orders/{customer.Id}");
+  }
+
+  private async Task EditProfile()
+  {
+    if (customer == null) return;
+
+    var parameters = new DialogParameters { { "Customer", customer } };
+    var options    = new DialogOptions    { CloseButton = true, MaxWidth = MaxWidth.Small };
+    var dialogRef  = DialogService.Show<CustomerInfoDialog>("Edit Profile", parameters, options);
+
+    var result = await dialogRef.Result;
+    if (!result.Canceled)
     {
-        var email = await ((CustomAuthStateProvider)AuthStateProvider).GetStoredUserEmail();
+      customer = (CustomerDTO)result.Data!;
+      Snackbar.Add("Profile updated!", Severity.Success);
 
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity.IsAuthenticated)
-        {
-            userRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No Role Assigned";
-        }
-
-        if (string.IsNullOrEmpty(email))
-        {
-            Console.WriteLine("Error: No email found in local storage!");
-            return;
-        }
-
-        try
-        {
-            customer = await APIClient.GetFromJsonAsync<CustomerDTO>($"https://localhost:7218/api/Customer/{email}");
-
-            if (customer == null)
-            {
-                Console.WriteLine("Error: Customer not found.");
-                return;
-            }
-
-            customerId = customer.Id;
-            orders = await APIClient.GetFromJsonAsync<List<OrderDTO>>($"https://localhost:7218/api/Order/orders/{customerId}");
-
-
-            if (orders == null || orders.Count == 0)
-            {
-                Console.WriteLine("No orders found for this customer.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"API Error: {ex.Message}");
-        }
+      orders = await APIClient
+        .GetFromJsonAsync<List<OrderDTO>>(
+          $"https://localhost:7218/api/Order/orders/{customer.Id}");
     }
-
-    public void ExpandItem()
-    {
-        _expand = !_expand;
-    }
+  }
 }
